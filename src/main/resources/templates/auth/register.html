@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="id" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daftar — SmartWaste</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>tailwind.config = { theme: { extend: { fontFamily: { sans: ['Plus Jakarta Sans', 'sans-serif'] } } } }</script>
+    <style>
+        .hero-gradient { background: linear-gradient(135deg, #022c22 0%, #064e3b 50%, #065f46 100%); }
+        .input-field { transition: all 0.2s; }
+        .input-field:focus { box-shadow: 0 0 0 3px rgba(16,185,129,0.25); }
+        .blob { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; animation: morph 8s ease-in-out infinite; }
+        @keyframes morph { 0%,100%{border-radius:60% 40% 30% 70% / 60% 30% 70% 40%} 50%{border-radius:30% 60% 70% 40% / 50% 60% 30% 60%} }
+    </style>
+</head>
+<body class="font-sans min-h-screen bg-gray-50" x-data="{
+    step: 1,
+    form: { name:'', email:'', password:'', phone:'', nik:'', address:'', rtRw:'', kelurahan:'' },
+    showPass: false,
+    loading: false,
+    errors: {}
+}">
+
+<div class="min-h-screen grid lg:grid-cols-5">
+    <!-- Left Panel (Branding) -->
+    <div class="hidden lg:flex lg:col-span-2 hero-gradient flex-col justify-between p-10 relative overflow-hidden">
+        <div class="absolute -top-20 -right-20 w-72 h-72 blob bg-emerald-700/20"></div>
+        <div class="absolute -bottom-10 -left-10 w-80 h-80 blob bg-green-800/20" style="animation-delay:-4s"></div>
+
+        <div class="relative z-10 flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-400 to-green-600 flex items-center justify-center text-white font-bold">♻</div>
+            <span class="text-white font-bold text-xl">SmartWaste</span>
+        </div>
+
+        <div class="relative z-10">
+            <div class="text-5xl mb-5" style="animation: morph 6s ease-in-out infinite;">🌱</div>
+            <h2 class="text-3xl font-black text-white leading-tight mb-4">
+                Bergabunglah dengan<br><span class="text-emerald-300">komunitas hijau</span><br>kami hari ini!
+            </h2>
+            <p class="text-emerald-200/70 text-sm leading-relaxed">Daftar gratis dan mulai perjalanan hijau Anda. Setiap setoran sampah membawa Anda selangkah lebih dekat menuju bumi yang lebih baik.</p>
+
+            <div class="mt-8 space-y-3">
+                <div class="flex items-center gap-3 text-emerald-200 text-sm">
+                    <div class="w-6 h-6 bg-emerald-500/30 rounded-full flex items-center justify-center text-xs">✓</div>
+                    Gratis selamanya — tidak ada biaya tersembunyi
+                </div>
+                <div class="flex items-center gap-3 text-emerald-200 text-sm">
+                    <div class="w-6 h-6 bg-emerald-500/30 rounded-full flex items-center justify-center text-xs">✓</div>
+                    Green Wallet aktif sejak setoran pertama
+                </div>
+                <div class="flex items-center gap-3 text-emerald-200 text-sm">
+                    <div class="w-6 h-6 bg-emerald-500/30 rounded-full flex items-center justify-center text-xs">✓</div>
+                    Akses chatbot AI Mistral 24/7
+                </div>
+            </div>
+        </div>
+
+        <p class="relative z-10 text-emerald-400/50 text-xs">© 2024 SmartWaste — Trinetra PBO Project</p>
+    </div>
+
+    <!-- Right Panel: Form -->
+    <div class="col-span-5 lg:col-span-3 flex items-center justify-center px-6 py-12">
+        <div class="w-full max-w-lg">
+
+            <!-- Mobile logo -->
+            <div class="lg:hidden flex items-center gap-3 justify-center mb-8">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-green-600 flex items-center justify-center text-white font-bold">♻</div>
+                <span class="text-gray-800 font-bold text-xl">SmartWaste</span>
+            </div>
+
+            <div class="mb-8">
+                <h1 class="text-3xl font-black text-gray-900">Buat Akun Baru 🌿</h1>
+                <p class="text-gray-500 mt-2">Daftar sebagai warga komunitas — gratis!</p>
+            </div>
+
+            <!-- Step Indicator -->
+            <div class="flex items-center gap-3 mb-8">
+                <div class="flex items-center gap-2">
+                    <div :class="step >= 1 ? 'bg-emerald-500 text-white' : 'bg-gray-200 text-gray-400'"
+                         class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all">1</div>
+                    <span :class="step >= 1 ? 'text-emerald-600' : 'text-gray-400'" class="text-xs font-medium">Akun</span>
+                </div>
+                <div class="flex-1 h-0.5" :class="step >= 2 ? 'bg-emerald-500' : 'bg-gray-200'" style="transition:background 0.3s"></div>
+                <div class="flex items-center gap-2">
+                    <div :class="step >= 2 ? 'bg-emerald-500 text-white' : 'bg-gray-200 text-gray-400'"
+                         class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all">2</div>
+                    <span :class="step >= 2 ? 'text-emerald-600' : 'text-gray-400'" class="text-xs font-medium">Identitas</span>
+                </div>
+            </div>
+
+            <form th:action="@{/api/v1/auth/register}" method="POST" id="registerForm">
+
+                <!-- Step 1: Account Info -->
+                <div x-show="step === 1" x-transition class="space-y-5">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Nama Lengkap *</label>
+                        <input x-model="form.name" type="text" name="name" required placeholder="Contoh: Budi Santoso"
+                               class="input-field w-full bg-white border border-gray-200 rounded-xl px-4 py-3.5 text-gray-900 text-sm outline-none focus:border-emerald-500 placeholder-gray-400 shadow-sm">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Email *</label>
+                        <input x-model="form.email" type="email" name="email" required placeholder="budi@email.com"
+                               class="input-field w-full bg-white border border-gray-200 rounded-xl px-4 py-3.5 text-gray-900 text-sm outline-none focus:border-emerald-500 placeholder-gray-400 shadow-sm">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Password *</label>
+                        <div class="relative">
+                            <input x-model="form.password" :type="showPass ? 'text' : 'password'" name="password" required placeholder="Minimal 8 karakter"
+                                   class="input-field w-full bg-white border border-gray-200 rounded-xl px-4 py-3.5 text-gray-900 text-sm outline-none focus:border-emerald-500 placeholder-gray-400 shadow-sm pr-12">
+                            <button type="button" @click="showPass=!showPass" class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm">
+                                <span x-show="!showPass">👁</span><span x-show="showPass">🙈</span>
+                            </button>
+                        </div>
+                        <!-- Password Strength -->
+                        <div class="mt-2 flex gap-1" x-show="form.password.length > 0">
+                            <div :class="form.password.length >= 8 ? 'bg-emerald-400' : 'bg-gray-200'" class="flex-1 h-1 rounded-full transition-colors"></div>
+                            <div :class="form.password.length >= 10 && /[A-Z]/.test(form.password) ? 'bg-emerald-400' : 'bg-gray-200'" class="flex-1 h-1 rounded-full transition-colors"></div>
+                            <div :class="form.password.length >= 12 && /[0-9]/.test(form.password) ? 'bg-emerald-400' : 'bg-gray-200'" class="flex-1 h-1 rounded-full transition-colors"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Nomor Telepon</label>
+                        <input x-model="form.phone" type="tel" name="phone" placeholder="08xxxxxxxxxx"
+                               class="input-field w-full bg-white border border-gray-200 rounded-xl px-4 py-3.5 text-gray-900 text-sm outline-none focus:border-emerald-500 placeholder-gray-400 shadow-sm">
+                    </div>
+                    <button type="button" @click="if(form.name && form.email && form.password.length >= 8) step=2"
+                            class="w-full bg-gradient-to-r from-emerald-500 to-green-500 text-white font-bold py-4 rounded-xl text-sm transition-all hover:shadow-lg hover:shadow-emerald-500/30 hover:-translate-y-0.5">
+                        Lanjut ke Identitas →
+                    </button>
+                </div>
+
+                <!-- Step 2: Identity Info -->
+                <div x-show="step === 2" x-transition class="space-y-5">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">NIK (16 digit)</label>
+                        <input x-model="form.nik" type="text" name="nik" maxlength="16" placeholder="3201XXXXXXXXXXXX"
+                               class="input-field w-full bg-white border border-gray-200 rounded-xl px-4 py-3.5 text-gray-900 text-sm outline-none focus:border-emerald-500 placeholder-gray-400 shadow-sm font-mono">
+                        <p class="text-gray-400 text-xs mt-1" x-text="`${form.nik.length}/16 digit`"></p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Alamat Lengkap</label>
+                        <textarea x-model="form.address" name="address" rows="2" placeholder="Jl. Merdeka No. 123..."
+                                  class="input-field w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-gray-900 text-sm outline-none focus:border-emerald-500 placeholder-gray-400 shadow-sm resize-none"></textarea>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">RT/RW</label>
+                            <input x-model="form.rtRw" type="text" name="rtRw" placeholder="001/002"
+                                   class="input-field w-full bg-white border border-gray-200 rounded-xl px-4 py-3.5 text-gray-900 text-sm outline-none focus:border-emerald-500 placeholder-gray-400 shadow-sm">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Kelurahan</label>
+                            <input x-model="form.kelurahan" type="text" name="kelurahan" placeholder="Sukamaju"
+                                   class="input-field w-full bg-white border border-gray-200 rounded-xl px-4 py-3.5 text-gray-900 text-sm outline-none focus:border-emerald-500 placeholder-gray-400 shadow-sm">
+                        </div>
+                    </div>
+
+                    <div class="flex gap-4">
+                        <button type="button" @click="step=1"
+                                class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-600 font-bold py-4 rounded-xl text-sm transition-all">
+                            ← Kembali
+                        </button>
+                        <button type="submit"
+                                class="flex-2 flex-1 bg-gradient-to-r from-emerald-500 to-green-500 text-white font-bold py-4 rounded-xl text-sm transition-all hover:shadow-lg hover:shadow-emerald-500/30 hover:-translate-y-0.5">
+                            🌿 Daftar Sekarang!
+                        </button>
+                    </div>
+                </div>
+
+            </form>
+
+            <div class="text-center mt-6">
+                <p class="text-gray-500 text-sm">Sudah punya akun?
+                    <a th:href="@{/auth/login}" class="text-emerald-600 font-bold hover:text-emerald-700">Masuk →</a>
+                </p>
+            </div>
+            <p class="text-center text-gray-400 text-xs mt-4">
+                <a th:href="@{/}" class="hover:text-emerald-500 transition-colors">← Kembali ke Beranda</a>
+            </p>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

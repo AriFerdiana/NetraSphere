@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="id" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Collector Dashboard — SmartWaste</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>tailwind.config = { theme: { extend: { fontFamily: { sans: ['Plus Jakarta Sans', 'sans-serif'] } } } }</script>
+</head>
+<body class="font-sans bg-gray-50 flex items-center justify-center min-h-screen relative overflow-hidden" x-data="collectorDashboard()">
+
+    <!-- Blob Backgrounds -->
+    <div class="absolute top-0 left-0 w-full h-96 bg-emerald-600 rounded-b-[4rem] z-0 shadow-lg"></div>
+
+    <div class="relative z-10 w-full max-w-5xl px-6 py-10">
+        
+        <!-- Header Profile -->
+        <div class="flex items-center justify-between mb-8 text-white relative z-50">
+            <div class="flex items-center gap-4">
+                <div class="w-16 h-16 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center text-2xl font-bold border border-white/30 shadow-inner">
+                    🚚
+                </div>
+                <div>
+                    <h1 class="text-3xl font-black tracking-tight" th:text="${collectorName}">Nama Petugas</h1>
+                    <div class="flex items-center gap-3 mt-1.5 text-emerald-100 text-sm font-medium">
+                        <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-amber-300"></span> Petugas Lapangan</span>
+                        <span>•</span>
+                        <span th:text="${assignedArea}">Area Tugas</span>
+                        <span>•</span>
+                        <span class="font-mono bg-white/20 px-2 py-0.5 rounded text-white" th:text="${vehicleNumber}">B 1234 XY</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-4" x-data="{ open: false }">
+                <!-- Status Toggle -->
+                <div class="bg-white/10 backdrop-blur-md border border-white/20 px-5 py-2.5 rounded-2xl flex items-center gap-3">
+                    <form th:action="@{/collector/toggle-availability}" method="POST" class="flex items-center gap-2 cursor-pointer" onclick="this.submit()">
+                        <div class="w-3 h-3 rounded-full animate-pulse" th:classappend="${available} ? 'bg-emerald-400' : 'bg-red-400'"></div>
+                        <span class="font-semibold cursor-pointer hover:text-white" th:text="${available} ? 'Tersedia (Klik u/ Sibuk)' : 'Sibuk (Klik u/ Tersedia)'">Status</span>
+                    </form>
+                </div>
+
+                <!-- Account Dropdown -->
+                <div class="relative">
+                    <button @click="open = !open" class="w-14 h-14 bg-white rounded-2xl flex items-center justify-center text-emerald-600 font-bold text-xl shadow-xl hover:scale-105 transition-all">
+                        <span th:text="${collectorName.substring(0,1)}">P</span>
+                    </button>
+                    
+                    <div x-show="open" @click.away="open = false" x-transition 
+                         class="absolute right-0 mt-3 w-64 bg-white rounded-[2rem] shadow-2xl border border-gray-100 py-4 z-50 overflow-hidden text-gray-800">
+                        <div class="px-6 py-3 border-b border-gray-50 mb-2 bg-emerald-50/50">
+                            <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Petugas Aktif</p>
+                            <p class="text-sm font-bold text-gray-900 truncate" th:text="${collectorName}">Nama Petugas</p>
+                            <p class="text-[10px] text-emerald-600 font-bold" th:text="${assignedArea}">Area RT 01</p>
+                        </div>
+                        <button @click="showPasswordModal=true; open=false" class="w-full text-left flex items-center gap-3 px-6 py-3 text-sm font-semibold text-gray-600 hover:bg-emerald-50 hover:text-emerald-700 transition-colors">
+                            <span class="text-lg">🔑</span> Ganti Password
+                        </button>
+                        <div class="border-t border-gray-50 mt-2 pt-2">
+                            <form th:action="@{/auth/logout}" method="POST">
+                                <button type="submit" class="w-full text-left flex items-center gap-3 px-6 py-3 text-sm font-bold text-red-500 hover:bg-red-50 transition-colors">
+                                    <span class="text-lg">🚪</span> Keluar Sesi
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Notification Alert -->
+        <div x-show="notification.show" x-transition.opacity.duration.300ms class="mb-6 p-4 rounded-2xl flex items-center gap-3 shadow-md"
+             :class="notification.type === 'success' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-red-50 text-red-700 border border-red-200'">
+             <span x-text="notification.type === 'success' ? '✅' : '❌'"></span>
+             <p class="font-semibold text-sm" x-text="notification.message"></p>
+        </div>
+
+        <!-- Stats Widget -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+            <div class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 flex items-center gap-4">
+                <div class="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-xl">✅</div>
+                <div>
+                    <p class="text-2xl font-black text-gray-900" th:text="${totalConfirmed}">0</p>
+                    <p class="text-xs text-gray-500 font-medium">Selesai</p>
+                </div>
+            </div>
+            <div class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 flex items-center gap-4">
+                <div class="w-12 h-12 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-xl">⏳</div>
+                <div>
+                    <p class="text-2xl font-black text-gray-900" th:text="${pendingDeposits.numberOfElements}">0</p>
+                    <p class="text-xs text-gray-500 font-medium">Menunggu</p>
+                </div>
+            </div>
+            <div class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 flex items-center gap-4">
+                <div class="w-12 h-12 rounded-xl bg-red-50 text-red-600 flex items-center justify-center text-xl">❌</div>
+                <div>
+                    <p class="text-2xl font-black text-gray-900" th:text="${totalRejected}">0</p>
+                    <p class="text-xs text-gray-500 font-medium">Ditolak</p>
+                </div>
+            </div>
+            <div class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 flex items-center gap-4">
+                <div class="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-xl">🎯</div>
+                <div>
+                    <p class="text-2xl font-black text-gray-900" th:text="${totalConfirmed + totalRejected + pendingDeposits.numberOfElements}">0</p>
+                    <p class="text-xs text-gray-500 font-medium">Total Tugas</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Card: Pending Deposits -->
+        <div class="bg-white rounded-[2rem] shadow-xl p-8 border border-gray-100 relative">
+            
+            <div class="flex items-center justify-between mb-8">
+                <div>
+                    <h2 class="text-xl font-bold text-gray-900">Tugas Konfirmasi Menunggu</h2>
+                    <p class="text-sm text-gray-500 mt-1">Konfirmasi setoran untuk mendistribusikan poin ke warga</p>
+                </div>
+                <div class="bg-amber-100 text-amber-700 px-4 py-2 rounded-xl font-bold text-sm flex items-center gap-2">
+                    <div class="w-2.5 h-2.5 bg-amber-500 rounded-full animate-pulse"></div>
+                    <span th:text="${pendingDeposits.numberOfElements} + ' Setoran Baru'">0 Setoran Baru</span>
+                </div>
+            </div>
+
+            <!-- List of Deposits -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                
+                <div th:each="d : ${pendingDeposits.content}" class="border border-gray-200 rounded-2xl p-5 hover:border-emerald-300 hover:shadow-md transition-all group bg-white">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600 font-bold" th:text="${d.citizenName.substring(0,1)}">C</div>
+                            <div>
+                                <h3 class="font-bold text-gray-900 leading-tight" th:text="${d.citizenName}">Warga C</h3>
+                                <p class="text-xs text-gray-500 mt-0.5" th:text="${#temporals.format(d.createdAt, 'dd MMM yyyy, HH:mm')}">Time</p>
+                            </div>
+                        </div>
+                        <span th:if="${d.fromIoT}" class="bg-blue-100 text-blue-700 text-[10px] font-black tracking-wider uppercase px-2 py-1 rounded-lg">🤖 IoT</span>
+                    </div>
+
+                    <div class="bg-gray-50 rounded-xl p-4 mb-5 border border-gray-100 flex justify-between items-center">
+                        <div class="flex items-center gap-3">
+                            <span class="text-2xl" th:switch="${d.categoryType}">
+                                <span th:case="'ORGANIC'">🍃</span>
+                                <span th:case="'INORGANIC'">♻️</span>
+                                <span th:case="'B3'">⚠️</span>
+                            </span>
+                            <div>
+                                <p class="text-xs text-gray-400 font-semibold mb-0.5">Kategori / Berat</p>
+                                <p class="font-bold text-gray-900 text-sm">
+                                    <span th:text="${d.categoryName}">Plastik</span> 
+                                    <span class="text-emerald-600 text-base ml-1" th:text="${#numbers.formatDecimal(d.weightKg, 1, 1)} + ' kg'">2.0 kg</span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div th:if="${d.imageUrl != null}" class="mb-4 overflow-hidden rounded-xl border border-gray-100 shadow-sm aspect-video bg-gray-100 flex items-center justify-center">
+                        <img th:src="${d.imageUrl}" class="w-full h-full object-cover cursor-pointer hover:scale-105 transition-transform" 
+                             @click="window.open(this.src, '_blank')">
+                    </div>
+
+                    <p th:if="${d.notes != null and !d.notes.empty}" class="text-xs text-gray-500 italic mb-4 p-3 bg-amber-50/50 rounded-xl border border-amber-100">
+                        "[[${d.notes}]]"
+                    </p>
+
+                    <div class="flex items-center gap-3">
+                        <form th:action="@{/collector/deposit/{id}/confirm(id=${d.id})}" method="POST" class="flex-1" onsubmit="return confirm('Anda yakin ingin mengkonfirmasi setoran ini? Poin akan ditambahkan ke warga langsung.')">
+                            <button type="submit" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-2.5 rounded-xl transition-colors text-sm shadow-sm">
+                                ✓ Konfirmasi
+                            </button>
+                        </form>
+                        
+                        <form th:action="@{/collector/deposit/{id}/reject(id=${d.id})}" method="POST" class="flex-1" onsubmit="const r = prompt('Masukkan alasan penolakan:'); if(r===null) return false; this.querySelector('input[name=reason]').value = r;">
+                            <input type="hidden" name="reason" value="">
+                            <button type="submit" 
+                                    class="w-full bg-red-50 hover:bg-red-100 text-red-600 font-bold py-2.5 rounded-xl transition-colors text-sm shadow-sm border border-red-200">
+                                ✕ Tolak
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <div th:if="${pendingDeposits.content.empty}" class="col-span-full py-16 text-center bg-gray-50 rounded-3xl border-2 border-dashed border-gray-200">
+                    <div class="text-5xl mb-4">🎉</div>
+                    <h3 class="text-xl font-bold text-gray-800">Kerja Bagus!</h3>
+                    <p class="text-gray-500 mt-2">Tidak ada setoran yang menunggu konfirmasi saat ini.</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script th:inline="javascript">
+        function collectorDashboard() {
+            return {
+                notification: { 
+                    show: /*[[${successMessage != null || errorMessage != null}]]*/ false, 
+                    message: /*[[${successMessage != null ? successMessage : (errorMessage != null ? errorMessage : '')}]]*/ '', 
+                    type: /*[[${successMessage != null ? 'success' : 'error'}]]*/ '' 
+                },
+                init() {
+                    if(this.notification.show) {
+                        setTimeout(() => { this.notification.show = false; }, 4000);
+                    }
+                },
+                showPasswordModal: false
+            }
+        }
+    </script>
+
+    <!-- ===== MODAL: GANTI PASSWORD ===== -->
+    <div x-show="showPasswordModal" style="display:none;" x-transition class="fixed inset-0 bg-gray-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div @click.away="showPasswordModal=false" class="bg-white rounded-3xl shadow-2xl w-full max-w-lg p-8">
+            <div class="flex items-center justify-between mb-6">
+                <div>
+                    <h3 class="text-xl font-black text-gray-900">🔑 Ganti Password</h3>
+                </div>
+                <button @click="showPasswordModal=false" class="w-9 h-9 bg-gray-100 hover:bg-gray-200 rounded-xl flex items-center justify-center text-gray-500 transition-colors">✕</button>
+            </div>
+            <form th:action="@{/user/change-password}" method="POST" class="space-y-4" onsubmit="return document.getElementById('newPwC').value === document.getElementById('confirmPwC').value;">
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Password Lama</label>
+                    <input type="password" name="oldPassword" required class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-emerald-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Password Baru</label>
+                    <input type="password" id="newPwC" name="newPassword" required minlength="6" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-emerald-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Konfirmasi Password Baru</label>
+                    <input type="password" id="confirmPwC" required minlength="6" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-emerald-500">
+                    <p class="text-xs text-red-500 mt-1 hidden" id="pwMatchErrorC">Password tidak cocok!</p>
+                </div>
+                <div class="flex gap-3 mt-4">
+                    <button type="button" @click="showPasswordModal=false" class="flex-1 bg-gray-100 text-gray-600 font-bold py-3.5 rounded-xl text-sm hover:bg-gray-200 transition-colors">Batal</button>
+                    <button type="submit" class="flex-1 bg-emerald-500 text-white font-bold py-3.5 rounded-xl text-sm hover:shadow-lg hover:bg-emerald-600 transition-all">Simpan Password</button>
+                </div>
+            </form>
+            <script>
+                document.getElementById('confirmPwC').addEventListener('input', function() {
+                    const pw1 = document.getElementById('newPwC').value;
+                    const pw2 = this.value;
+                    const error = document.getElementById('pwMatchErrorC');
+                    if(pw1 !== pw2) {
+                        error.classList.remove('hidden');
+                    } else {
+                        error.classList.add('hidden');
+                    }
+                });
+            </script>
+        </div>
+    </div>
+</body>
+</html>

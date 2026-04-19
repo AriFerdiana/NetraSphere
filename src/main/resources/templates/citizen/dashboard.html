@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="id" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${pageTitle} + ' — SmartWaste'">Dashboard Warga — SmartWaste</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>tailwind.config = { theme: { extend: { fontFamily: { sans: ['Plus Jakarta Sans', 'sans-serif'] } } } }</script>
+    <style>
+        .wallet-gradient { background: linear-gradient(135deg, #059669 0%, #10b981 50%, #34d399 100%); }
+        .glass { backdrop-filter: blur(12px); background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); }
+        .card { background: white; border-radius: 1.25rem; box-shadow: 0 4px 24px rgba(0,0,0,0.06); }
+        .modal-overlay { background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); }
+        .input-field:focus { box-shadow: 0 0 0 3px rgba(16,185,129,0.25); }
+        .badge-pending { background: #fef3c7; color: #d97706; }
+        .badge-confirmed { background: #d1fae5; color: #059669; }
+        .badge-rejected { background: #fee2e2; color: #dc2626; }
+        .sidebar-link { transition: all 0.2s; }
+        .sidebar-link:hover, .sidebar-link.active { background: rgba(16,185,129,0.1); color: #059669; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-slide-up { animation: slideUp 0.4s ease forwards; }
+    </style>
+</head>
+<body class="font-sans bg-gray-50 min-h-screen">
+
+<!-- ===== TOP NAVBAR ===== -->
+<nav class="bg-white border-b border-gray-100 sticky top-0 z-40 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-between h-16">
+            <!-- Logo -->
+            <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-400 to-green-600 flex items-center justify-center text-white font-bold">♻</div>
+                <div>
+                    <span class="font-bold text-gray-800 text-sm">SmartWaste</span>
+                    <span class="block text-emerald-500 text-xs leading-none">Community System</span>
+                </div>
+            </div>
+            <!-- Nav -->
+            <div class="hidden md:flex items-center gap-1">
+                <button @click="activeTab='dashboard'" :class="activeTab === 'dashboard' ? 'active px-4 py-2 rounded-xl text-sm font-semibold text-emerald-600 bg-emerald-50' : 'sidebar-link px-4 py-2 rounded-xl text-sm font-medium text-gray-500'">🏠 Dashboard</button>
+                <button @click="activeTab='history'" :class="activeTab === 'history' ? 'active px-4 py-2 rounded-xl text-sm font-semibold text-emerald-600 bg-emerald-50' : 'sidebar-link px-4 py-2 rounded-xl text-sm font-medium text-gray-500'">📋 Riwayat</button>
+                <button @click="showRedeemModal=true" class="sidebar-link px-4 py-2 rounded-xl text-sm font-medium text-gray-500">🎁 Tukar Poin</button>
+            </div>
+            <!-- User Menu -->
+            <div class="flex items-center gap-3" x-data="{ open: false }">
+                <div class="text-right hidden sm:block">
+                    <p class="text-sm font-semibold text-gray-700" th:text="${profile.name}">Nama Warga</p>
+                    <p class="text-xs text-emerald-600" th:text="${wallet.level}">🌱 Green Starter</p>
+                </div>
+                <div class="relative">
+                    <button @click="open=!open" class="w-10 h-10 bg-gradient-to-br from-emerald-400 to-green-600 rounded-full flex items-center justify-center text-white font-bold text-sm hover:scale-105 transition-transform">
+                        <span th:text="${profile.name.substring(0,1)}">A</span>
+                    </button>
+                    <div x-show="open" @click.away="open=false" x-transition
+                         class="absolute right-0 mt-2 w-48 bg-white rounded-2xl shadow-xl border border-gray-100 py-2 z-50">
+                        <div class="px-4 py-2 border-b border-gray-50 mb-1">
+                            <p class="text-xs font-semibold text-gray-800" th:text="${profile.name}">Nama</p>
+                            <p class="text-xs text-gray-400" th:text="${profile.email}">email@email.com</p>
+                        </div>
+                        <button @click="showProfileModal=true; open=false" class="w-full text-left flex items-center gap-3 px-4 py-2.5 text-sm text-gray-600 hover:bg-gray-50 cursor-pointer">👤 Profil Saya</button>
+                        <button @click="showSettingsModal=true; open=false" class="w-full text-left flex items-center gap-3 px-4 py-2.5 text-sm text-gray-600 hover:bg-gray-50 cursor-pointer">⚙️ Pengaturan</button>
+                        <div class="border-t border-gray-50 mt-1 pt-1">
+                            <form th:action="@{/auth/logout}" method="POST">
+                                <button type="submit" class="flex items-center gap-3 px-4 py-2.5 text-sm text-red-500 hover:bg-red-50 w-full text-left">🚪 Keluar</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!-- ===== MAIN CONTENT ===== -->
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" x-data="{
+    activeTab: 'dashboard',
+    showDepositModal: false,
+    showChatModal: false,
+    showRedeemModal: false,
+    showProfileModal: false,
+    showSettingsModal: false,
+    showPasswordModal: false,
+    showStatsModal: false,
+    chatMessages: [],
+    chatInput: '',
+    chatLoading: false,
+    selectedCategory: '',
+    weight: '',
+    notes: '',
+    redeemPoints: '',
+    redeemDescription: '',
+    
+    notification: { 
+        show: /*[[${successMessage != null || errorMessage != null}]]*/ false, 
+        message: /*[[${successMessage != null ? successMessage : (errorMessage != null ? errorMessage : '')}]]*/ '', 
+        type: /*[[${successMessage != null ? 'success' : 'error'}]]*/ '' 
+    },
+    
+    init() {
+        if(this.notification.show) {
+            setTimeout(() => { this.notification.show = false; }, 4000);
+        }
+    },
+
+    async sendChat() {
+        if (!this.chatInput.trim()) return;
+        const msg = this.chatInput;
+        this.chatMessages.push({ role: 'user', content: msg });
+        this.chatInput = '';
+        this.chatLoading = true;
+        try {
+            const res = await fetch('/api/v1/chat/anonymous', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: msg })
+            });
+            const data = await res.json();
+            this.chatMessages.push({ role: 'ai', content: data.data?.message || 'Maaf, terjadi kesalahan.' });
+        } catch(e) {
+            this.chatMessages.push({ role: 'ai', content: 'Maaf, layanan AI sedang tidak tersedia.' });
+        }
+        this.chatLoading = false;
+        this.$nextTick(() => { const el = this.$refs.chatBox; if(el) el.scrollTop = el.scrollHeight; });
+    }
+}">
+
+    <!-- Notification Alert -->
+    <div x-show="notification.show" x-transition.opacity.duration.300ms class="mb-6 p-4 rounded-2xl flex items-center gap-3 shadow-md"
+         :class="notification.type === 'success' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-red-50 text-red-700 border border-red-200'">
+         <span x-text="notification.type === 'success' ? '✅' : '❌'"></span>
+         <p class="font-semibold text-sm" x-text="notification.message"></p>
+    </div>
+
+    <!-- ===== TAB: DASHBOARD ===== -->
+    <div x-show="activeTab === 'dashboard'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0">
+        <!-- ===== GREETING ===== -->
+        <div class="mb-8 flex items-center justify-between">
+        <div>
+            <h1 class="text-2xl font-black text-gray-900">
+                Halo, <span class="text-emerald-600" th:text="${profile.name}">Nama</span>! 👋
+            </h1>
+            <p class="text-gray-500 text-sm mt-1">Selamat datang kembali di Smart Community Waste System</p>
+        </div>
+        <button @click="showDepositModal=true"
+                class="bg-gradient-to-r from-emerald-500 to-green-500 text-white font-bold px-6 py-3 rounded-2xl text-sm hover:shadow-lg hover:shadow-emerald-500/30 hover:-translate-y-0.5 transition-all flex items-center gap-2">
+            <span>+ Setor Sampah</span>
+        </button>
+    </div>
+
+    <!-- ===== GREEN WALLET HERO CARD ===== -->
+    <div class="wallet-gradient rounded-3xl p-6 md:p-8 mb-6 text-white relative overflow-hidden animate-slide-up">
+        <!-- Decorative blobs -->
+        <div class="absolute top-0 right-0 w-64 h-64 rounded-full bg-white/10 -translate-y-1/2 translate-x-1/2"></div>
+        <div class="absolute bottom-0 left-0 w-48 h-48 rounded-full bg-black/10 translate-y-1/2 -translate-x-1/2"></div>
+
+        <div class="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+            <div>
+                <div class="flex items-center gap-2 mb-2">
+                    <span class="text-emerald-100 text-sm font-medium">💚 Green Wallet</span>
+                    <span class="bg-white/20 text-white text-xs px-2.5 py-1 rounded-full font-semibold" th:text="${wallet.level}">🌱 Starter</span>
+                </div>
+                <p class="text-white/70 text-sm mb-1">Total Poin Terkumpul</p>
+                <p class="text-5xl font-black" th:text="${#numbers.formatDecimal(wallet.totalPoints, 1, 0)}">0</p>
+                <p class="text-emerald-100 text-sm mt-1">poin</p>
+
+                <!-- Progress bar to next level -->
+                <div class="mt-4 max-w-xs">
+                    <div class="flex justify-between text-xs text-white/70 mb-1">
+                        <span>Progress ke level berikutnya</span>
+                        <span th:text="${wallet.progressToNextLevel} + '%'">0%</span>
+                    </div>
+                    <div class="bg-white/20 rounded-full h-2.5">
+                        <div class="bg-white rounded-full h-2.5 transition-all duration-700"
+                             th:style="'width: ' + ${wallet.progressToNextLevel} + '%'"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Wallet Stats -->
+            <div class="grid grid-cols-3 gap-4">
+                <div class="glass rounded-2xl p-4 text-center">
+                    <p class="text-2xl font-black" th:text="${#numbers.formatDecimal(wallet.availablePoints,1,0)}">0</p>
+                    <p class="text-white/70 text-xs mt-1">Poin Tersedia</p>
+                </div>
+                <div class="glass rounded-2xl p-4 text-center">
+                    <p class="text-2xl font-black" th:text="${profile.totalDeposits}">0</p>
+                    <p class="text-white/70 text-xs mt-1">Total Setoran</p>
+                </div>
+                <div class="glass rounded-2xl p-4 text-center">
+                    <p class="text-2xl font-black" th:text="${#numbers.formatDecimal(profile.totalWeightKg, 1, 1)}">0</p>
+                    <p class="text-white/70 text-xs mt-1">kg Sampah</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== QUICK ACTIONS ===== -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+        <button @click="showDepositModal=true"
+                class="card p-5 text-center hover:shadow-lg hover:shadow-emerald-100 hover:-translate-y-1 transition-all cursor-pointer group">
+            <div class="w-12 h-12 mx-auto mb-3 bg-emerald-100 rounded-2xl flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">🗑️</div>
+            <p class="font-bold text-gray-800 text-sm">Setor Sampah</p>
+            <p class="text-gray-400 text-xs mt-1">Buat setoran baru</p>
+        </button>
+        <button @click="showRedeemModal=true" class="card p-5 text-center hover:shadow-lg hover:-translate-y-1 transition-all cursor-pointer group">
+            <div class="w-12 h-12 mx-auto mb-3 bg-amber-100 rounded-2xl flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">🎁</div>
+            <p class="font-bold text-gray-800 text-sm">Tukar Poin</p>
+            <p class="text-gray-400 text-xs mt-1" th:text="${#numbers.formatDecimal(wallet.availablePoints,1,0)} + ' pts tersedia'">0 pts tersedia</p>
+        </button>
+        <button @click="showChatModal=true"
+                class="card p-5 text-center hover:shadow-lg hover:-translate-y-1 transition-all cursor-pointer group">
+            <div class="w-12 h-12 mx-auto mb-3 bg-purple-100 rounded-2xl flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">🧠</div>
+            <p class="font-bold text-gray-800 text-sm">Tanya AI</p>
+            <p class="text-gray-400 text-xs mt-1">Mistral AI Chatbot</p>
+        </button>
+        <button @click="showStatsModal=true" class="card p-5 text-center hover:shadow-lg hover:-translate-y-1 transition-all cursor-pointer group">
+            <div class="w-12 h-12 mx-auto mb-3 bg-blue-100 rounded-2xl flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">📊</div>
+            <p class="font-bold text-gray-800 text-sm">Statistik</p>
+            <p class="text-gray-400 text-xs mt-1">Lihat pencapaian</p>
+        </button>
+    </div>
+    </div> <!-- END TAB: DASHBOARD -->
+
+    <!-- ===== TAB: RIWAYAT ===== -->
+    <div x-show="activeTab === 'history'" style="display:none;" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0">
+        <!-- ===== RECENT DEPOSITS TABLE ===== -->
+        <div class="card p-6">
+        <div class="flex items-center justify-between mb-6">
+            <div>
+                <h2 class="text-lg font-black text-gray-900">Riwayat Setoran Sampah</h2>
+                <p class="text-gray-400 text-sm" th:text="${deposits.totalElements} + ' total setoran'">0 total setoran</p>
+            </div>
+            <button @click="showDepositModal=true"
+                    class="text-emerald-600 font-semibold text-sm hover:text-emerald-700 flex items-center gap-1">
+                + Setor Sampah
+            </button>
+        </div>
+
+        <!-- Empty State -->
+        <div th:if="${deposits.content.empty}" class="text-center py-16">
+            <div class="text-6xl mb-4">🗑️</div>
+            <h3 class="font-bold text-gray-700 mb-2">Belum ada setoran</h3>
+            <p class="text-gray-400 text-sm mb-6">Mulai setor sampah pertama Anda dan dapatkan Green Points!</p>
+            <button @click="showDepositModal=true"
+                    class="bg-emerald-500 text-white font-bold px-6 py-3 rounded-xl text-sm hover:bg-emerald-600 transition-colors">
+                + Buat Setoran Pertama
+            </button>
+        </div>
+
+        <!-- Table -->
+        <div th:if="${!deposits.content.empty}" class="overflow-x-auto">
+            <table class="w-full">
+                <thead>
+                    <tr class="text-left">
+                        <th class="pb-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Kategori</th>
+                        <th class="pb-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Berat</th>
+                        <th class="pb-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Poin</th>
+                        <th class="pb-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Status</th>
+                        <th class="pb-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Sumber</th>
+                        <th class="pb-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Tanggal</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-50">
+                    <tr th:each="deposit : ${deposits.content}"
+                        class="hover:bg-gray-50/50 transition-colors">
+                        <td class="py-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-9 h-9 bg-emerald-100 rounded-xl flex items-center justify-center">
+                                    <span th:switch="${deposit.categoryType}">
+                                        <span th:case="'ORGANIC'">🍃</span>
+                                        <span th:case="'INORGANIC'">♻️</span>
+                                        <span th:case="'B3'">⚠️</span>
+                                    </span>
+                                </div>
+                                <div>
+                                    <p class="font-semibold text-gray-800 text-sm" th:text="${deposit.categoryName}">Kategori</p>
+                                    <p class="text-gray-400 text-xs" th:text="${deposit.categoryType}">Type</p>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="py-4 font-semibold text-gray-700 text-sm" th:text="${#numbers.formatDecimal(deposit.weightKg, 1, 1)} + ' kg'">0 kg</td>
+                        <td class="py-4">
+                            <span th:if="${deposit.pointsEarned > 0}"
+                                  class="font-bold text-emerald-600 text-sm"
+                                  th:text="'+' + ${#numbers.formatDecimal(deposit.pointsEarned, 1, 0)} + ' pts'">+0 pts</span>
+                            <span th:if="${deposit.pointsEarned == 0}" class="text-gray-400 text-sm">Menunggu</span>
+                        </td>
+                        <td class="py-4">
+                            <span class="px-3 py-1.5 rounded-full text-xs font-bold"
+                                  th:classappend="${deposit.status.name() == 'CONFIRMED'} ? 'badge-confirmed' : (${deposit.status.name() == 'REJECTED'} ? 'badge-rejected' : 'badge-pending')"
+                                  th:text="${deposit.statusLabel}">Status</span>
+                        </td>
+                        <td class="py-4">
+                            <span th:if="${deposit.fromIoT}" class="bg-blue-100 text-blue-600 text-xs px-2 py-1 rounded-full font-medium">🤖 IoT</span>
+                            <span th:unless="${deposit.fromIoT}" class="bg-gray-100 text-gray-500 text-xs px-2 py-1 rounded-full">Manual</span>
+                        </td>
+                        <td class="py-4 text-gray-400 text-xs" th:text="${#temporals.format(deposit.createdAt, 'dd MMM yyyy')}">01 Jan 2024</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    </div> <!-- END TAB: RIWAYAT -->
+    <!-- END OF DASHBOARD WRAPPER -->
+
+<!-- ===== MODAL: SETOR SAMPAH ===== -->
+<div x-show="showDepositModal" x-transition class="fixed inset-0 modal-overlay z-50 flex items-center justify-center p-4">
+    <div @click.away="showDepositModal=false"
+         class="bg-white rounded-3xl shadow-2xl w-full max-w-lg p-8 animate-slide-up">
+        <div class="flex items-center justify-between mb-6">
+            <div>
+                <h3 class="text-xl font-black text-gray-900">🗑️ Setor Sampah Baru</h3>
+                <p class="text-gray-400 text-sm mt-1">Pilih kategori dan masukkan berat</p>
+            </div>
+            <button @click="showDepositModal=false" class="w-9 h-9 bg-gray-100 hover:bg-gray-200 rounded-xl flex items-center justify-center text-gray-500 transition-colors">✕</button>
+        </div>
+
+        <form th:action="@{/citizen/deposit}" method="POST" enctype="multipart/form-data" class="space-y-5">
+            <!-- Category Selection -->
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-3">Kategori Sampah *</label>
+                <div class="grid grid-cols-2 gap-2">
+                    <div th:each="cat : ${categories}">
+                        <input type="radio" name="categoryId" th:value="${cat.id}" th:id="'cat-' + ${cat.id}" class="hidden peer" required>
+                        <label th:for="'cat-' + ${cat.id}"
+                               class="flex items-center gap-3 p-3 border-2 border-gray-100 rounded-xl cursor-pointer peer-checked:border-emerald-500 peer-checked:bg-emerald-50 hover:border-emerald-200 transition-all">
+                            <span class="text-lg" th:text="${cat.iconUrl}">♻</span>
+                            <div>
+                                <p class="font-semibold text-gray-800 text-xs leading-tight" th:text="${cat.name}">Kategori</p>
+                                <p class="text-emerald-600 text-xs" th:text="${cat.pointsPerKg} + ' pts/kg'">0 pts/kg</p>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Weight -->
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">Berat Sampah (kg) *</label>
+                <div class="relative">
+                    <input type="number" name="weightKg" step="0.1" min="0.1" max="1000" required
+                           placeholder="Contoh: 2.5"
+                           x-model="weight"
+                           class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3.5 text-gray-900 text-sm outline-none focus:border-emerald-500 input-field pr-12">
+                    <span class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm font-medium">kg</span>
+                </div>
+            </div>
+
+            <!-- Photo Proof -->
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">Foto Bukti (Wajib)</label>
+                <div class="relative">
+                    <input type="file" name="file" accept="image/*" required
+                           class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-gray-900 text-sm outline-none focus:border-emerald-500 input-field file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100">
+                </div>
+                <p class="text-xs text-gray-400 mt-1">Upload foto sampah untuk validasi petugas.</p>
+            </div>
+
+            <!-- Notes -->
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">Catatan (Opsional)</label>
+                <textarea name="notes" rows="2" placeholder="Kondisi sampah, asal, dll..."
+                          class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-gray-900 text-sm outline-none focus:border-emerald-500 input-field resize-none"></textarea>
+            </div>
+
+            <div class="flex gap-3">
+                <button type="button" @click="showDepositModal=false"
+                        class="flex-1 bg-gray-100 text-gray-600 font-bold py-3.5 rounded-xl text-sm hover:bg-gray-200 transition-colors">Batal</button>
+                <button type="submit"
+                        class="flex-1 bg-gradient-to-r from-emerald-500 to-green-500 text-white font-bold py-3.5 rounded-xl text-sm hover:shadow-lg transition-all">
+                    🌿 Setor Sekarang
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- ===== MODAL: AI CHATBOT ===== -->
+<div x-show="showChatModal" x-transition class="fixed inset-0 modal-overlay z-50 flex items-center justify-center p-4">
+    <div @click.away="showChatModal=false"
+         class="bg-white rounded-3xl shadow-2xl w-full max-w-md animate-slide-up overflow-hidden flex flex-col" style="max-height: 80vh">
+        <!-- Header -->
+        <div class="bg-gradient-to-r from-emerald-500 to-green-500 p-5 flex items-center gap-3">
+            <div class="w-10 h-10 bg-white/20 rounded-2xl flex items-center justify-center text-xl">🧠</div>
+            <div>
+                <p class="font-bold text-white">SmartWaste AI</p>
+                <p class="text-emerald-100 text-xs">Mistral AI • Aktif</p>
+            </div>
+            <button @click="showChatModal=false" class="ml-auto text-white/70 hover:text-white transition-colors">✕</button>
+        </div>
+
+        <!-- Messages -->
+        <div class="flex-1 overflow-y-auto p-5 space-y-3 bg-gray-50" x-ref="chatBox">
+            <div class="flex gap-2">
+                <div class="w-7 h-7 bg-emerald-500 rounded-full flex items-center justify-center text-xs text-white flex-shrink-0">🧠</div>
+                <div class="bg-white rounded-2xl rounded-tl-none p-3.5 shadow-sm max-w-[80%]">
+                    <p class="text-gray-700 text-sm">Halo! Saya asisten AI SmartWaste. Saya bisa membantu Anda tentang:</p>
+                    <ul class="mt-2 space-y-1 text-xs text-gray-500">
+                        <li>♻️ Cara daur ulang yang benar</li>
+                        <li>💰 Estimasi poin dari sampah Anda</li>
+                        <li>🗑️ Kategori sampah (Organik, Anorganik, B3)</li>
+                    </ul>
+                </div>
+            </div>
+            <template x-for="(msg, i) in chatMessages" :key="i">
+                <div :class="msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'" class="flex gap-2">
+                    <div :class="msg.role === 'user' ? 'bg-emerald-500 text-white rounded-2xl rounded-tr-none' : 'bg-white text-gray-700 rounded-2xl rounded-tl-none shadow-sm'"
+                         class="p-3.5 max-w-[80%] text-sm" x-text="msg.content"></div>
+                </div>
+            </template>
+            <div x-show="chatLoading" class="flex gap-2">
+                <div class="w-7 h-7 bg-emerald-500 rounded-full flex items-center justify-center text-xs text-white flex-shrink-0">🧠</div>
+                <div class="bg-white rounded-2xl rounded-tl-none px-4 py-3 shadow-sm">
+                    <div class="flex gap-1">
+                        <div class="w-2 h-2 bg-emerald-400 rounded-full animate-bounce"></div>
+                        <div class="w-2 h-2 bg-emerald-400 rounded-full animate-bounce" style="animation-delay:0.1s"></div>
+                        <div class="w-2 h-2 bg-emerald-400 rounded-full animate-bounce" style="animation-delay:0.2s"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Input -->
+        <div class="p-4 bg-white border-t border-gray-100 flex gap-3">
+            <input x-model="chatInput"
+                   @keyup.enter="sendChat()"
+                   type="text"
+                   placeholder="Tanya sesuatu... misal: 'Berapa poin untuk 2 kg plastik?'"
+                   class="flex-1 bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-700 outline-none focus:border-emerald-500 transition-colors">
+            <button @click="sendChat()" :disabled="chatLoading || !chatInput.trim()"
+                    class="bg-emerald-500 hover:bg-emerald-600 disabled:bg-gray-300 text-white px-4 py-3 rounded-xl font-bold text-sm transition-colors">
+                →
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- ===== MODAL: REDEEM POINTS ===== -->
+<div x-show="showRedeemModal" x-transition class="fixed inset-0 modal-overlay z-50 flex items-center justify-center p-4">
+    <div @click.away="showRedeemModal=false"
+         class="bg-white rounded-3xl shadow-2xl w-full max-w-lg p-8 animate-slide-up">
+        <div class="flex items-center justify-between mb-6">
+            <div>
+                <h3 class="text-xl font-black text-gray-900">🎁 Penukaran Poin</h3>
+                <p class="text-gray-400 text-sm mt-1">Gunakan Poin Hijau Anda</p>
+            </div>
+            <button @click="showRedeemModal=false" class="w-9 h-9 bg-gray-100 hover:bg-gray-200 rounded-xl flex items-center justify-center text-gray-500 transition-colors">✕</button>
+        </div>
+
+        <div class="bg-emerald-50 rounded-2xl p-4 mb-5 text-center">
+            <p class="text-emerald-700 text-xs font-semibold mb-1">Saldo Tersedia</p>
+            <p class="text-2xl font-black text-emerald-600" th:text="${#numbers.formatDecimal(wallet.availablePoints, 1, 0)}">0</p>
+        </div>
+
+        <form th:action="@{/citizen/redeem}" method="POST" class="space-y-5">
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">Jumlah Poin *</label>
+                <div class="relative">
+                    <input type="number" name="points" min="10" th:max="${wallet.availablePoints}" required
+                           placeholder="Minimal 10"
+                           x-model="redeemPoints"
+                           class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3.5 text-gray-900 text-sm outline-none focus:border-emerald-500">
+                </div>
+                <p class="text-xs text-gray-400 mt-1">Pastikan saldo Anda mencukupi.</p>
+            </div>
+
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">Mau Ditukar Jadi Apa? *</label>
+                <select name="description" required class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3.5 text-gray-900 text-sm outline-none focus:border-emerald-500">
+                    <option value="" disabled selected>Pilih Reward...</option>
+                    <option value="Voucher Belanja Rp 10.000 (Min. 100 Poin)">💳 Voucher Belanja Rp 10.000 (100 Pts)</option>
+                    <option value="Diskon Tagihan Listrik (Min. 250 Poin)">💡 Diskon Tagihan Listrik (250 Pts)</option>
+                    <option value="Pulsa / Kuota Data (Min. 150 Poin)">📱 Pulsa / Kuota Data (150 Pts)</option>
+                    <option value="Donasi Penanaman Pohon (Min. 50 Poin)">🌳 Donasi Penanaman Pohon (50 Pts)</option>
+                    <option value="Lainnya">Lainnya...</option>
+                </select>
+            </div>
+
+            <div class="flex gap-3">
+                <button type="button" @click="showRedeemModal=false"
+                        class="flex-1 bg-gray-100 text-gray-600 font-bold py-3.5 rounded-xl text-sm hover:bg-gray-200 transition-colors">Batal</button>
+                <button type="submit"
+                        class="flex-1 bg-amber-500 text-white font-bold py-3.5 rounded-xl text-sm hover:shadow-lg hover:bg-amber-600 transition-all">
+                    Konfirmasi Penukaran
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- ===== MODAL: STATISTIK ===== -->
+<div x-show="showStatsModal" x-transition class="fixed inset-0 modal-overlay z-50 flex items-center justify-center p-4">
+    <div @click.away="showStatsModal=false" class="bg-white rounded-3xl shadow-2xl w-full max-w-lg p-8 animate-slide-up">
+        <div class="flex items-center justify-between mb-6">
+            <div>
+                <h3 class="text-xl font-black text-gray-900">📊 Statistik Warga</h3>
+                <p class="text-gray-400 text-sm mt-1">Pencapaian Ramah Lingkunganmu</p>
+            </div>
+            <button @click="showStatsModal=false" class="w-9 h-9 bg-gray-100 hover:bg-gray-200 rounded-xl flex items-center justify-center text-gray-500 transition-colors">✕</button>
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+            <div class="bg-emerald-50 rounded-2xl p-4 text-center border border-emerald-100">
+                <div class="text-3xl mb-2">🌿</div>
+                <p class="text-2xl font-black text-emerald-600" th:text="${profile.totalDeposits}">0</p>
+                <p class="text-gray-500 text-xs mt-1">Total Setoran</p>
+            </div>
+            <div class="bg-blue-50 rounded-2xl p-4 text-center border border-blue-100">
+                <div class="text-3xl mb-2">⚖️</div>
+                <p class="text-2xl font-black text-blue-600" th:text="${#numbers.formatDecimal(profile.totalWeightKg, 1, 1)} + ' kg'">0 kg</p>
+                <p class="text-gray-500 text-xs mt-1">Berat Diselamatkan</p>
+            </div>
+            <div class="bg-amber-50 rounded-2xl p-4 text-center border border-amber-100 col-span-2">
+                <div class="text-3xl mb-2">🏆</div>
+                <p class="text-2xl font-black text-amber-600" th:text="${#numbers.formatDecimal(wallet.totalPoints, 1, 0)} + ' Poin'">0 Poin</p>
+                <p class="text-gray-500 text-xs mt-1">Total Poin Seumur Hidup</p>
+            </div>
+        </div>
+        <button @click="showStatsModal=false" class="w-full mt-6 bg-gray-100 text-gray-600 font-bold py-3.5 rounded-xl text-sm hover:bg-gray-200 transition-colors">Tutup</button>
+    </div>
+</div>
+
+<!-- ===== MODAL: PROFIL SAYA ===== -->
+<div x-show="showProfileModal" x-transition class="fixed inset-0 modal-overlay z-50 flex items-center justify-center p-4">
+    <div @click.away="showProfileModal=false" class="bg-white rounded-3xl shadow-2xl w-full max-w-lg p-8 animate-slide-up">
+        <div class="flex items-center justify-between mb-6">
+            <h3 class="text-xl font-black text-gray-900">👤 Profil Saya</h3>
+            <button @click="showProfileModal=false" class="w-9 h-9 bg-gray-100 hover:bg-gray-200 rounded-xl flex items-center justify-center text-gray-500 transition-colors">✕</button>
+        </div>
+        <div class="space-y-4">
+            <div class="flex items-center gap-4 mb-6">
+                <div class="w-16 h-16 bg-gradient-to-br from-emerald-400 to-green-600 rounded-full flex items-center justify-center text-white font-bold text-2xl shadow-inner" th:text="${profile.name.substring(0,1)}"></div>
+                <div>
+                    <h4 class="text-lg font-bold text-gray-900" th:text="${profile.name}">Nama</h4>
+                    <p class="text-emerald-600 text-sm font-semibold" th:text="${wallet.level}">Level</p>
+                </div>
+            </div>
+            <div class="bg-gray-50 rounded-2xl p-4 border border-gray-100 space-y-3">
+                <div><p class="text-xs text-gray-400 font-semibold uppercase tracking-wider">Email</p><p class="text-sm font-medium text-gray-800" th:text="${profile.email}">-</p></div>
+                <div><p class="text-xs text-gray-400 font-semibold uppercase tracking-wider">No. HP</p><p class="text-sm font-medium text-gray-800" th:text="${profile.phone != null ? profile.phone : '-'}">-</p></div>
+                <div><p class="text-xs text-gray-400 font-semibold uppercase tracking-wider">NIK</p><p class="text-sm font-mono text-gray-800" th:text="${profile.nik != null ? profile.nik : '-'}">-</p></div>
+                <div><p class="text-xs text-gray-400 font-semibold uppercase tracking-wider">Alamat</p><p class="text-sm font-medium text-gray-800" th:text="${profile.address != null ? profile.address : '-'}">-</p></div>
+            </div>
+            <div class="flex gap-3 mt-4">
+                <button @click="showProfileModal=false; showSettingsModal=true" class="flex-1 bg-emerald-50 text-emerald-600 font-bold py-3.5 rounded-xl text-sm border border-emerald-200 hover:bg-emerald-100 transition-colors">✏️ Edit Profil</button>
+                <button @click="showProfileModal=false; showPasswordModal=true" class="flex-1 bg-amber-50 text-amber-600 font-bold py-3.5 rounded-xl text-sm border border-amber-200 hover:bg-amber-100 transition-colors">🔑 Ganti Password</button>
+                <button @click="showProfileModal=false" class="flex-1 bg-gray-100 text-gray-600 font-bold py-3.5 rounded-xl text-sm hover:bg-gray-200 transition-colors">Tutup</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ===== MODAL: PENGATURAN ===== -->
+<div x-show="showSettingsModal" x-transition class="fixed inset-0 modal-overlay z-50 flex items-center justify-center p-4">
+    <div @click.away="showSettingsModal=false" class="bg-white rounded-3xl shadow-2xl w-full max-w-lg p-8 animate-slide-up">
+        <div class="flex items-center justify-between mb-6">
+            <div>
+                <h3 class="text-xl font-black text-gray-900">⚙️ Pengaturan</h3>
+                <p class="text-gray-400 text-sm mt-1">Perbarui data diri Anda</p>
+            </div>
+            <button @click="showSettingsModal=false" class="w-9 h-9 bg-gray-100 hover:bg-gray-200 rounded-xl flex items-center justify-center text-gray-500 transition-colors">✕</button>
+        </div>
+        <form th:action="@{/citizen/settings}" method="POST" class="space-y-4">
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-1">Nama Lengkap</label>
+                <input type="text" name="name" required th:value="${profile.name}" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-emerald-500">
+            </div>
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-1">No. Handphone</label>
+                <input type="text" name="phone" th:value="${profile.phone}" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-emerald-500">
+            </div>
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-1">Alamat Lengkap</label>
+                <textarea name="address" rows="2" th:text="${profile.address}" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-emerald-500 resize-none"></textarea>
+            </div>
+            <div class="flex gap-3 mt-4">
+                <button type="button" @click="showSettingsModal=false" class="flex-1 bg-gray-100 text-gray-600 font-bold py-3.5 rounded-xl text-sm hover:bg-gray-200 transition-colors">Batal</button>
+                <button type="submit" class="flex-1 bg-emerald-500 text-white font-bold py-3.5 rounded-xl text-sm hover:shadow-lg hover:bg-emerald-600 transition-all">Simpan Perubahan</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- ===== MODAL: GANTI PASSWORD ===== -->
+<div x-show="showPasswordModal" x-transition class="fixed inset-0 modal-overlay z-50 flex items-center justify-center p-4">
+    <div @click.away="showPasswordModal=false" class="bg-white rounded-3xl shadow-2xl w-full max-w-lg p-8 animate-slide-up">
+        <div class="flex items-center justify-between mb-6">
+            <div>
+                <h3 class="text-xl font-black text-gray-900">🔑 Ganti Password</h3>
+            </div>
+            <button @click="showPasswordModal=false" class="w-9 h-9 bg-gray-100 hover:bg-gray-200 rounded-xl flex items-center justify-center text-gray-500 transition-colors">✕</button>
+        </div>
+        <form th:action="@{/user/change-password}" method="POST" class="space-y-4" onsubmit="return document.getElementById('newPw').value === document.getElementById('confirmPw').value;">
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-1">Password Lama</label>
+                <input type="password" name="oldPassword" required class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-emerald-500">
+            </div>
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-1">Password Baru</label>
+                <input type="password" id="newPw" name="newPassword" required minlength="6" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-emerald-500">
+            </div>
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-1">Konfirmasi Password Baru</label>
+                <input type="password" id="confirmPw" required minlength="6" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-emerald-500">
+                <p class="text-xs text-red-500 mt-1 hidden" id="pwMatchError">Password tidak cocok!</p>
+            </div>
+            <div class="flex gap-3 mt-4">
+                <button type="button" @click="showPasswordModal=false" class="flex-1 bg-gray-100 text-gray-600 font-bold py-3.5 rounded-xl text-sm hover:bg-gray-200 transition-colors">Batal</button>
+                <button type="submit" class="flex-1 bg-emerald-500 text-white font-bold py-3.5 rounded-xl text-sm hover:shadow-lg hover:bg-emerald-600 transition-all">Simpan Password</button>
+            </div>
+        </form>
+        <script>
+            document.getElementById('confirmPw').addEventListener('input', function() {
+                const pw1 = document.getElementById('newPw').value;
+                const pw2 = this.value;
+                const error = document.getElementById('pwMatchError');
+                if(pw1 !== pw2) {
+                    error.classList.remove('hidden');
+                } else {
+                    error.classList.add('hidden');
+                }
+            });
+        </script>
+    </div>
+</div>
+
+
+<!-- Floating AI Button -->
+<button @click="showChatModal=true"
+        class="fixed bottom-6 right-6 w-14 h-14 bg-gradient-to-br from-emerald-500 to-green-600 rounded-2xl flex items-center justify-center text-2xl shadow-xl shadow-emerald-500/40 hover:scale-110 transition-transform z-30">
+    🧠
+</button>
+
+</div><!-- end main content (x-data wrapper) -->
+
+</body>
+</html>

@@ -1,0 +1,26 @@
+target/
+!.mvn/wrapper/maven-wrapper.jar
+/static/uploads/
+/uploads/
+*.class
+*.log
+*.ctxt
+*.jar
+*.war
+*.zip
+*.tar.gz
+*.rar
+
+# IDE specific files
+.metadata
+.classpath
+.project
+.settings/
+.idea/
+*.iml
+*.iws
+.vscode/
+.DS_Store
+
+# Temporary files
+database_dump.sql.tmp

@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="id" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard — SmartWaste</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>tailwind.config = { theme: { extend: { fontFamily: { sans: ['Plus Jakarta Sans', 'sans-serif'] } } } }</script>
+    <style>
+        .sidebar { width: 260px; min-height: 100vh; background: linear-gradient(180deg, #022c22 0%, #064e3b 100%); }
+        .main-content { flex: 1; min-width: 0; }
+        .card { background: white; border-radius: 1.25rem; box-shadow: 0 2px 16px rgba(0,0,0,0.06); }
+        .nav-link { display: flex; align-items: center; gap: 12px; padding: 10px 16px; border-radius: 12px; color: rgba(167,243,208,0.8); font-size: 0.875rem; font-weight: 500; transition: all 0.2s; cursor: pointer; }
+        .nav-link:hover, .nav-link.active { background: rgba(255,255,255,0.1); color: white; }
+        .badge { display: inline-flex; align-items: center; padding: 3px 10px; border-radius: 999px; font-size: 0.7rem; font-weight: 700; }
+        .badge-pending { background:#fef3c7; color:#d97706; }
+        .badge-confirmed { background:#d1fae5; color:#059669; }
+        .badge-rejected { background:#fee2e2; color:#dc2626; }
+        @keyframes slideIn { from{opacity:0;transform:translateX(-20px)}to{opacity:1;transform:translateX(0)} }
+        .animate-in { animation: slideIn 0.4s ease forwards; }
+    </style>
+</head>
+<body class="font-sans bg-gray-50 flex" x-data="adminDashboard()">
+
+<!-- ===== SIDEBAR ===== -->
+<div class="sidebar flex-shrink-0 flex flex-col fixed h-full z-40 hidden lg:flex">
+    <!-- Logo -->
+    <div class="p-6 border-b border-white/10">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-400 to-green-500 flex items-center justify-center text-white font-bold text-lg">♻</div>
+            <div>
+                <p class="text-white font-bold text-base">SmartWaste</p>
+                <p class="text-emerald-400 text-xs">Admin Panel</p>
+            </div>
+        </div>
+    </div>
+ 
+    <!-- Navigation -->
+    <nav class="p-4 flex-1 space-y-1">
+        <p class="text-emerald-600 text-xs font-bold uppercase tracking-widest px-3 mb-3">Menu Utama</p>
+        <div class="nav-link active" @click="activeTab='overview'">
+            <span class="text-lg">📊</span> Ringkasan
+        </div>
+        <div class="nav-link" @click="activeTab='citizens'">
+            <span class="text-lg">👥</span> Manajemen Warga
+            <span class="ml-auto bg-emerald-500 text-white text-xs px-2 py-0.5 rounded-full"
+                  th:text="${report.totalCitizens}">0</span>
+        </div>
+        <div class="nav-link" @click="activeTab='deposits'">
+            <span class="text-lg">🗑️</span> Setoran Sampah
+            <span th:if="${report.pendingDeposits > 0}"
+                  class="ml-auto bg-amber-500 text-white text-xs px-2 py-0.5 rounded-full"
+                  th:text="${report.pendingDeposits} + ' pending'">0</span>
+        </div>
+        <div class="nav-link" @click="activeTab='categories'">
+            <span class="text-lg">🏷️</span> Kategori
+        </div>
+        <div class="nav-link" @click="activeTab='collectors'">
+            <span class="text-lg">🚚</span> Petugas
+        </div>
+        <div class="nav-link" @click="activeTab='redemptions'">
+            <span class="text-lg">🎁</span> Penukaran Poin
+        </div>
+        <div class="nav-link" @click="activeTab='reports'">
+            <span class="text-lg">📈</span> Laporan & Grafik
+        </div>
+ 
+        <div class="border-t border-white/10 pt-4 mt-4">
+            <p class="text-emerald-600 text-xs font-bold uppercase tracking-widest px-3 mb-3">Sistem</p>
+            <a th:href="@{/swagger-ui.html}" target="_blank" class="nav-link">
+                <span class="text-lg">📋</span> API Dokumentasi
+            </a>
+        </div>
+    </nav>
+</div>
+
+<!-- ===== MAIN CONTENT ===== -->
+<div class="lg:ml-[260px] main-content min-h-screen">
+
+    <!-- Top Bar -->
+    <div class="bg-white border-b border-gray-100 sticky top-0 z-30 px-6 py-4 flex items-center justify-between shadow-sm">
+        <div class="flex items-center gap-4">
+            <button class="lg:hidden text-gray-500 text-2xl">☰</button>
+            <div>
+                <h1 class="text-xl font-black text-gray-900" x-text="tabTitle()">Ringkasan</h1>
+                <p class="text-gray-400 text-xs mt-0.5" th:text="'Data per: ' + ${#temporals.format(#temporals.createNow(), 'dd MMM yyyy HH:mm')}">Data per: -</p>
+            </div>
+        </div>
+        
+        <div class="flex items-center gap-6">
+            <div class="hidden md:flex items-center gap-3">
+                <div class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
+                <span class="text-emerald-600 text-xs font-semibold">Sistem Aktif</span>
+            </div>
+            
+            <!-- User Dropdown -->
+            <div class="relative" x-data="{ open: false }">
+                <button @click="open = !open" class="flex items-center gap-3 hover:bg-gray-50 px-3 py-2 rounded-2xl transition-all border border-transparent hover:border-gray-100">
+                    <div class="text-right hidden sm:block">
+                        <p class="text-sm font-bold text-gray-900" sec:authentication="name">Admin</p>
+                        <p class="text-[10px] text-emerald-600 font-bold uppercase tracking-wider">Super Admin</p>
+                    </div>
+                    <div class="w-10 h-10 bg-gradient-to-br from-emerald-500 to-green-600 rounded-2xl flex items-center justify-center text-white font-bold shadow-lg shadow-emerald-500/20">
+                        A
+                    </div>
+                </button>
+                
+                <div x-show="open" @click.away="open = false" x-transition:enter="transition ease-out duration-100" x-transition:enter-start="transform opacity-0 scale-95" x-transition:enter-end="transform opacity-100 scale-100" class="absolute right-0 mt-2 w-56 bg-white rounded-[2rem] shadow-2xl border border-gray-100 py-3 z-50 overflow-hidden">
+                    <div class="px-6 py-3 border-b border-gray-50 mb-2 bg-emerald-50/30">
+                        <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Akun Saya</p>
+                        <p class="text-sm font-bold text-gray-900 truncate" sec:authentication="name">admin@smartwaste.com</p>
+                    </div>
+                    <button @click="showPasswordModal=true; open=false" class="w-full text-left flex items-center gap-3 px-6 py-3 text-sm font-semibold text-gray-600 hover:bg-emerald-50 hover:text-emerald-700 transition-colors">
+                        <span class="text-lg">🔑</span> Ganti Password
+                    </button>
+                    <div class="border-t border-gray-50 mt-2 pt-2">
+                        <form th:action="@{/auth/logout}" method="POST">
+                            <button type="submit" class="w-full text-left flex items-center gap-3 px-6 py-3 text-sm font-bold text-red-500 hover:bg-red-50 transition-colors">
+                                <span class="text-lg">🚪</span> Keluar Sesi
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="p-6">
+
+        <!-- =================== TAB: OVERVIEW =================== -->
+        <div x-show="activeTab === 'overview'" class="space-y-6 animate-in">
+
+            <!-- Stat Cards -->
+            <div class="grid grid-cols-2 xl:grid-cols-4 gap-4">
+                <div class="card p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="w-12 h-12 bg-emerald-100 rounded-2xl flex items-center justify-center text-2xl">👥</div>
+                        <span class="text-emerald-500 text-xs font-semibold bg-emerald-50 px-2 py-1 rounded-full">Aktif</span>
+                    </div>
+                    <p class="text-3xl font-black text-gray-900" th:text="${report.totalCitizens}">0</p>
+                    <p class="text-gray-400 text-sm mt-1">Total Warga</p>
+                </div>
+                <div class="card p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="w-12 h-12 bg-blue-100 rounded-2xl flex items-center justify-center text-2xl">🗑️</div>
+                        <span class="text-amber-500 text-xs font-semibold bg-amber-50 px-2 py-1 rounded-full"
+                              th:text="${report.pendingDeposits} + ' pending'">0 pending</span>
+                    </div>
+                    <p class="text-3xl font-black text-gray-900" th:text="${report.totalDeposits}">0</p>
+                    <p class="text-gray-400 text-sm mt-1">Total Setoran</p>
+                </div>
+                <div class="card p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="w-12 h-12 bg-green-100 rounded-2xl flex items-center justify-center text-2xl">⚖️</div>
+                        <span class="text-blue-500 text-xs font-semibold bg-blue-50 px-2 py-1 rounded-full">kg</span>
+                    </div>
+                    <p class="text-3xl font-black text-gray-900"
+                       th:text="${#numbers.formatDecimal(report.totalWeightKg, 1, 1)}">0</p>
+                    <p class="text-gray-400 text-sm mt-1">Total Berat Sampah</p>
+                </div>
+                <div class="card p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="w-12 h-12 bg-amber-100 rounded-2xl flex items-center justify-center text-2xl">💚</div>
+                        <span class="text-purple-500 text-xs font-semibold bg-purple-50 px-2 py-1 rounded-full">poin</span>
+                    </div>
+                    <p class="text-3xl font-black text-gray-900"
+                       th:text="${#numbers.formatDecimal(report.totalPointsDistributed, 1, 0)}">0</p>
+                    <p class="text-gray-400 text-sm mt-1">Poin Disebar</p>
+                </div>
+            </div>
+
+            <!-- Charts Row -->
+            <div class="grid lg:grid-cols-3 gap-6">
+                <!-- Monthly Chart -->
+                <div class="card p-6 lg:col-span-2">
+                    <h3 class="font-bold text-gray-800 mb-1">Statistik Setoran Bulanan</h3>
+                    <p class="text-gray-400 text-xs mb-4">Jumlah setoran dan berat total per bulan</p>
+                    <canvas id="monthlyChart" height="100"></canvas>
+                </div>
+
+                <!-- Leaderboard -->
+                <div class="card p-6">
+                    <h3 class="font-bold text-gray-800 mb-1">🏆 Top Citizen</h3>
+                    <p class="text-gray-400 text-xs mb-4">Berdasarkan total poin</p>
+                    <div class="space-y-4">
+                        <div th:each="citizen, iter : ${report.topCitizens}" class="flex items-center gap-3">
+                            <div th:switch="${iter.index}"
+                                 class="w-7 h-7 rounded-full flex items-center justify-center text-xs font-black flex-shrink-0">
+                                <span th:case="0" class="w-7 h-7 bg-amber-400 text-white rounded-full flex items-center justify-center text-xs">🥇</span>
+                                <span th:case="1" class="w-7 h-7 bg-gray-300 text-white rounded-full flex items-center justify-center text-xs">🥈</span>
+                                <span th:case="2" class="w-7 h-7 bg-amber-600 text-white rounded-full flex items-center justify-center text-xs">🥉</span>
+                                <span th:case="*" class="w-7 h-7 bg-gray-100 text-gray-600 rounded-full flex items-center justify-center text-xs" th:text="${iter.index + 1}">4</span>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <p class="font-semibold text-gray-800 text-sm truncate" th:text="${citizen.name}">Nama</p>
+                                <p class="text-gray-400 text-xs" th:text="${citizen.level}">Level</p>
+                            </div>
+                            <span class="text-emerald-600 text-sm font-bold"
+                                  th:text="${#numbers.formatDecimal(citizen.totalPoints, 1, 0)} + 'p'">0p</span>
+                        </div>
+                        <div th:if="${report.topCitizens.empty}" class="text-center text-gray-400 text-sm py-4">Belum ada data</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Deposits Preview -->
+            <div class="card p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="font-bold text-gray-800">Setoran Terbaru</h3>
+                    <button @click="activeTab='deposits'" class="text-emerald-600 text-sm font-semibold">Lihat Semua →</button>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead>
+                            <tr class="text-left">
+                                <th class="pb-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Warga</th>
+                                <th class="pb-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Kategori</th>
+                                <th class="pb-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Berat</th>
+                                <th class="pb-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Poin</th>
+                                <th class="pb-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Status</th>
+                                <th class="pb-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Tanggal</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-50">
+                            <tr th:each="d : ${deposits.content}" class="hover:bg-gray-50/50 transition-colors">
+                                <td class="py-3">
+                                    <p class="font-semibold text-gray-800 text-sm" th:text="${d.citizenName}">Nama</p>
+                                </td>
+                                <td class="py-3">
+                                    <div class="flex items-center gap-2">
+                                        <span th:switch="${d.categoryType}">
+                                            <span th:case="'ORGANIC'">🍃</span>
+                                            <span th:case="'INORGANIC'">♻️</span>
+                                            <span th:case="'B3'">⚠️</span>
+                                        </span>
+                                        <span class="text-gray-700 text-sm" th:text="${d.categoryName}">Kategori</span>
+                                    </div>
+                                </td>
+                                <td class="py-3 text-gray-700 text-sm" th:text="${#numbers.formatDecimal(d.weightKg,1,1)} + ' kg'">0</td>
+                                <td class="py-3 font-bold text-emerald-600 text-sm"
+                                    th:text="${d.pointsEarned > 0} ? '+' + ${#numbers.formatDecimal(d.pointsEarned,1,0)} : '-'">-</td>
+                                <td class="py-3">
+                                    <span class="badge"
+                                          th:classappend="${d.status.name() == 'CONFIRMED'} ? 'badge-confirmed' : (${d.status.name() == 'REJECTED'} ? 'badge-rejected' : 'badge-pending')"
+                                          th:text="${d.statusLabel}">Status</span>
+                                </td>
+                                <td class="py-3 text-gray-400 text-xs"
+                                    th:text="${#temporals.format(d.createdAt, 'dd MMM yyyy')}">01 Jan 2024</td>
+                            </tr>
+                            <tr th:if="${deposits.content.empty}">
+                                <td colspan="6" class="py-8 text-center text-gray-400 text-sm">Belum ada setoran</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Admin Action Buttons on Overview -->
+            <div class="flex flex-wrap gap-4 mt-6">
+                <a th:href="@{/admin/export/deposits}" class="bg-gray-900 text-white hover:bg-gray-800 px-6 py-3 rounded-xl font-bold flex items-center gap-2 transition-all shadow-md">
+                    ⬇️ Download Laporan CSV
+                </a>
+            </div>
+
+        </div><!-- End Overview Tab -->
+
+        <!-- =================== TAB: DEPOSITS =================== -->
+        <div x-show="activeTab === 'deposits'" class="animate-in" style="display:none;">
+            <div class="card p-6">
+                <div class="flex flex-col md:flex-row items-center justify-between mb-6 gap-4">
+                    <h3 class="font-bold text-gray-800 text-lg">Semua Setoran Sampah</h3>
+                    
+                    <form th:action="@{/admin/dashboard}" method="GET" class="flex flex-wrap items-center gap-3 bg-gray-50 p-2 rounded-2xl border border-gray-100">
+                        <input type="hidden" name="activeTab" value="deposits">
+                        <div class="flex items-center gap-2">
+                            <label class="text-[10px] font-bold text-gray-400 uppercase">Dari:</label>
+                            <input type="date" name="startDate" th:value="${startDate}" 
+                                   class="bg-white border border-gray-200 rounded-lg px-2 py-1 text-xs outline-none focus:border-emerald-500">
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <label class="text-[10px] font-bold text-gray-400 uppercase">Hingga:</label>
+                            <input type="date" name="endDate" th:value="${endDate}" 
+                                   class="bg-white border border-gray-200 rounded-lg px-2 py-1 text-xs outline-none focus:border-emerald-500">
+                        </div>
+                        <button type="submit" class="bg-emerald-600 text-white px-3 py-1 rounded-lg text-xs font-bold hover:bg-emerald-700 transition-colors">
+                            🔍 Filter
+                        </button>
+                        <a th:href="@{/admin/dashboard(activeTab='deposits')}" class="text-[10px] text-gray-400 hover:text-gray-600 font-bold underline">Reset</a>
+                    </form>
+
+                    <div class="flex gap-3">
+                        <a th:href="@{/admin/export/deposits/pdf}" class="bg-red-50 text-red-600 hover:bg-red-100 border border-red-200 px-4 py-2 rounded-xl text-sm font-semibold transition-colors flex items-center gap-2">
+                            📄 Export PDF
+                        </a>
+                        <a th:href="@{/admin/export/deposits}" class="bg-emerald-50 text-emerald-600 hover:bg-emerald-100 border border-emerald-200 px-4 py-2 rounded-xl text-sm font-semibold transition-colors flex items-center gap-2">
+                            ⬇️ Export CSV
+                        </a>
+                    </div>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead>
+                            <tr class="text-left bg-gray-50 rounded-xl">
+                                <th class="px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Warga</th>
+                                <th class="px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Kategori</th>
+                                <th class="px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Berat</th>
+                                <th class="px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Poin</th>
+                                <th class="px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Bukti</th>
+                                <th class="px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Status</th>
+                                <th class="px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Tanggal</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-50">
+                            <tr th:each="d : ${deposits.content}" class="hover:bg-gray-50/50 transition-colors">
+                                <td class="px-4 py-4">
+                                    <p class="font-semibold text-gray-800 text-sm" th:text="${d.citizenName}">Nama</p>
+                                </td>
+                                <td class="px-4 py-4">
+                                    <div class="flex items-center gap-2">
+                                        <span th:switch="${d.categoryType}">
+                                            <span th:case="'ORGANIC'">🍃</span>
+                                            <span th:case="'INORGANIC'">♻️</span>
+                                            <span th:case="'B3'">⚠️</span>
+                                        </span>
+                                        <span class="text-gray-700 text-sm" th:text="${d.categoryName}">Kategori</span>
+                                    </div>
+                                </td>
+                                <td class="px-4 py-4 text-gray-700 text-sm font-semibold" th:text="${#numbers.formatDecimal(d.weightKg,1,1)} + ' kg'">0</td>
+                                <td class="px-4 py-4 font-bold text-emerald-600 text-sm"
+                                    th:text="${d.pointsEarned > 0} ? '+' + ${#numbers.formatDecimal(d.pointsEarned,1,0)} : '-'">-</td>
+                                <td class="px-4 py-4">
+                                    <div th:if="${d.imageUrl != null}" class="w-10 h-10 rounded-lg overflow-hidden border border-gray-100 shadow-sm">
+                                        <img th:src="${d.imageUrl}" class="w-full h-full object-cover cursor-pointer hover:scale-110 transition-transform"
+                                             @click="window.open(this.src, '_blank')">
+                                    </div>
+                                    <span th:if="${d.imageUrl == null}" class="text-gray-300 text-xs">-</span>
+                                </td>
+                                <td class="px-4 py-4">
+                                    <span class="badge"
+                                          th:classappend="${d.status.name() == 'CONFIRMED'} ? 'badge-confirmed' : (${d.status.name() == 'REJECTED'} ? 'badge-rejected' : 'badge-pending')"
+                                          th:text="${d.statusLabel}">Status</span>
+                                </td>
+                                <td class="px-4 py-4 text-gray-400 text-xs"
+                                    th:text="${#temporals.format(d.createdAt, 'dd MMM yyyy, HH:mm')}">01 Jan 2024</td>
+                            </tr>
+                            <tr th:if="${deposits.content.empty}">
+                                <td colspan="6" class="py-8 text-center text-gray-400 text-sm">Belum ada setoran</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div><!-- End Deposits Tab -->
+
+        <!-- =================== TAB: CITIZENS =================== -->
+        <div x-show="activeTab === 'citizens'" class="animate-in">
+            <div class="card p-6">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="font-bold text-gray-800 text-lg">Manajemen Warga</h3>
+                    <div class="flex gap-3">
+                        <!-- Search Form -->
+                        <form th:action="@{/admin/dashboard}" method="GET" class="flex gap-2">
+                            <input type="text" name="search" th:value="${search}"
+                                   placeholder="Cari nama, email, NIK..."
+                                   class="bg-gray-50 border border-gray-200 rounded-xl px-4 py-2 text-sm text-gray-700 outline-none focus:border-emerald-500 w-64">
+                            <button type="submit" class="bg-emerald-500 text-white px-4 py-2 rounded-xl text-sm font-semibold hover:bg-emerald-600 transition-colors">
+                                🔍
+                            </button>
+                        </form>
+                        <button @click="showImportModal=true" class="bg-blue-50 text-blue-600 border border-blue-200 px-4 py-2 rounded-xl text-sm font-semibold hover:bg-blue-100 transition-colors flex items-center gap-2">
+                            ⬆️ Import CSV
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Modal Import CSV -->
+                <div x-show="showImportModal" style="display:none;" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+                    <div @click.away="showImportModal=false" class="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl relative">
+                        <button @click="showImportModal=false" class="absolute top-4 right-4 text-gray-400 hover:text-gray-800 text-xl">✕</button>
+                        <h3 class="text-xl font-bold mb-2">Import Data Warga</h3>
+                        <p class="text-sm text-gray-500 mb-6">Unggah file CSV dengan format: Nama, Email, NIK, NoHP, Alamat, Password</p>
+                        <form th:action="@{/admin/citizens/import}" method="POST" enctype="multipart/form-data" class="space-y-4">
+                            <div class="border-2 border-dashed border-gray-300 rounded-xl p-6 text-center hover:bg-gray-50 transition-colors relative">
+                                <input type="file" name="file" accept=".csv" required class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
+                                <div class="text-3xl mb-2">📄</div>
+                                <p class="text-sm font-semibold text-emerald-600">Pilih file CSV</p>
+                                <p class="text-xs text-gray-400 mt-1">Maks. ukuran 5MB</p>
+                            </div>
+                            <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl transition-all shadow-md">
+                                Mulai Import
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead>
+                            <tr class="text-left bg-gray-50 rounded-xl">
+                                <th class="px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Warga</th>
+                                <th class="px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">NIK</th>
+                                <th class="px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Setoran</th>
+                                <th class="px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Poin</th>
+                                <th class="px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Level</th>
+                                <th class="px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-50">
+                            <tr th:each="c : ${citizens.content}" class="hover:bg-gray-50/50 transition-colors">
+                                <td class="px-4 py-4">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-9 h-9 bg-gradient-to-br from-emerald-400 to-green-500 rounded-full flex items-center justify-center text-white font-bold text-sm"
+                                             th:text="${c.name.substring(0,1)}">A</div>
+                                        <div>
+                                            <p class="font-semibold text-gray-800 text-sm" th:text="${c.name}">Nama</p>
+                                            <p class="text-gray-400 text-xs" th:text="${c.email}">email</p>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-4 py-4 font-mono text-gray-500 text-xs" th:text="${c.nik != null ? c.nik : '-'}">-</td>
+                                <td class="px-4 py-4 text-gray-700 text-sm font-semibold" th:text="${c.totalDeposits}">0</td>
+                                <td class="px-4 py-4 text-emerald-600 font-bold text-sm"
+                                    th:text="${#numbers.formatDecimal(c.totalPoints, 1, 0)}">0</td>
+                                <td class="px-4 py-4 text-gray-500 text-xs" th:text="${c.availablePoints >= 1000 ? '⭐' : '🌱'} + ' ' + (${c.totalPoints >= 10000 ? 'Platinum' : c.totalPoints >= 5000 ? 'Gold' : c.totalPoints >= 1000 ? 'Silver' : 'Starter'})">🌱 Starter</td>
+                                <td class="px-4 py-4">
+                                    <form th:action="@{/admin/citizens/{id}/toggle(id=${c.id})}" method="POST">
+                                        <button type="submit" 
+                                                th:classappend="${c.active} ? 'bg-emerald-100 text-emerald-700 hover:bg-red-100 hover:text-red-700' : 'bg-red-100 text-red-700 hover:bg-emerald-100 hover:text-emerald-700'"
+                                                class="px-3 py-1 rounded-full text-xs font-bold transition-all"
+                                                th:text="${c.active} ? '✓ Aktif' : '✕ Nonaktif'"></button>
+                                    </form>
+                                </td>
+                            </tr>
+                            <tr th:if="${citizens.content.empty}">
+                                <td colspan="6" class="py-12 text-center text-gray-400">
+                                    <div class="text-4xl mb-2">👥</div>
+                                    <p>Tidak ada warga ditemukan</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <!-- Pagination -->
+                <div class="flex items-center justify-between mt-6 pt-4 border-t border-gray-50">
+                    <p class="text-gray-400 text-sm"
+                       th:text="'Menampilkan ' + ${citizens.numberOfElements} + ' dari ' + ${citizens.totalElements} + ' warga'">0</p>
+                    <div class="flex gap-2">
+                        <a th:if="${citizens.hasPrevious()}"
+                           th:href="@{/admin/dashboard(page=${citizens.number - 1})}"
+                           class="px-4 py-2 bg-gray-100 text-gray-600 rounded-xl text-sm hover:bg-gray-200 transition-colors">← Prev</a>
+                        <span class="px-4 py-2 bg-emerald-500 text-white rounded-xl text-sm"
+                              th:text="'Hal. ' + ${citizens.number + 1} + ' / ' + ${citizens.totalPages}">1</span>
+                        <a th:if="${citizens.hasNext()}"
+                           th:href="@{/admin/dashboard(page=${citizens.number + 1})}"
+                           class="px-4 py-2 bg-gray-100 text-gray-600 rounded-xl text-sm hover:bg-gray-200 transition-colors">Next →</a>
+                    </div>
+                </div>
+            </div>
+        </div><!-- End Citizens Tab -->
+
+        <!-- =================== TAB: CATEGORIES =================== -->
+        <div x-show="activeTab === 'categories'" class="animate-in">
+            <div class="card p-6">
+                <h3 class="font-bold text-gray-800 text-lg mb-6">Kategori Sampah</h3>
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div th:each="cat : ${categories}"
+                         class="border-2 rounded-2xl p-5 hover:border-emerald-300 transition-all"
+                         th:classappend="${cat.active} ? 'border-emerald-100 bg-emerald-50/50' : 'border-gray-100 bg-gray-50 opacity-60'">
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="text-3xl" th:text="${cat.iconUrl}">♻</span>
+                            <div class="flex items-center gap-2">
+                                <span class="badge"
+                                      th:classappend="${cat.type.name() == 'ORGANIC'} ? 'badge-confirmed' : (${cat.type.name() == 'B3'} ? 'badge-rejected' : 'badge-pending')"
+                                      th:text="${cat.typeLabel}">Type</span>
+                            </div>
+                        </div>
+                        <h4 class="font-bold text-gray-800 mb-1" th:text="${cat.name}">Nama Kategori</h4>
+                        <p class="text-gray-400 text-xs mb-3" th:text="${cat.description}">Deskripsi</p>
+                        <div class="flex items-center justify-between">
+                            <span class="text-emerald-600 font-black text-lg"
+                                  th:text="${cat.pointsPerKg} + ' pts/kg'">0</span>
+                            <form th:action="@{/admin/categories/{id}/toggle(id=${cat.id})}" method="POST">
+                                <button type="submit" 
+                                        th:classappend="${cat.active} ? 'text-emerald-500 font-semibold' : 'text-gray-400'"
+                                        class="text-xs transition-colors hover:text-gray-800"
+                                        th:text="${cat.active} ? '✓ Aktif' : 'Nonaktif'"></button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Add New Category Card -->
+                    <div class="border-2 border-dashed border-gray-300 rounded-2xl p-5 flex items-center justify-center hover:bg-gray-50 transition-colors cursor-pointer group"
+                         @click="showAddCategoryModal = true">
+                        <div class="text-center">
+                            <div class="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center text-xl text-gray-500 group-hover:bg-emerald-100 group-hover:text-emerald-600 transition-colors mx-auto mb-3">+</div>
+                            <p class="font-bold text-gray-600 group-hover:text-emerald-600">Tambah Kategori</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Modal Add Category (AlpineJS) -->
+            <div x-show="showAddCategoryModal" style="display:none;" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+                <div @click.away="showAddCategoryModal = false" class="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl relative">
+                    <button @click="showAddCategoryModal = false" class="absolute top-4 right-4 text-gray-400 hover:text-gray-800 text-xl">✕</button>
+                    <h3 class="text-xl font-bold mb-6">Tambah Kategori Baru</h3>
+                    <form th:action="@{/admin/categories}" method="POST" class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-1">Nama Kategori</label>
+                            <input type="text" name="name" required class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-emerald-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-1">Tipe</label>
+                            <select name="type" required class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-emerald-500">
+                                <option value="ORGANIC">Organik</option>
+                                <option value="INORGANIC">Anorganik</option>
+                                <option value="B3">B3 (Berbahaya)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-1">Poin per Kg</label>
+                            <input type="number" step="0.1" name="pointsPerKg" required class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-emerald-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-1">Deskripsi</label>
+                            <textarea name="description" rows="2" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-emerald-500"></textarea>
+                        </div>
+                        <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3.5 rounded-xl transition-all shadow-lg shadow-emerald-500/30 mt-2">
+                            Simpan Kategori
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+        </div><!-- End Categories Tab -->
+
+        <!-- =================== TAB: COLLECTORS =================== -->
+        <div x-show="activeTab === 'collectors'" class="animate-in" style="display:none;">
+            <div class="card p-6">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="font-bold text-gray-800 text-lg">Manajemen Petugas (Collector)</h3>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead>
+                            <tr class="text-left bg-gray-50 rounded-xl">
+                                <th class="px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Nama & Email</th>
+                                <th class="px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Kendaraan</th>
+                                <th class="px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Area</th>
+                                <th class="px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Status</th>
+                                <th class="px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Total Setoran</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-50">
+                            <tr th:each="c : ${collectors.content}" class="hover:bg-gray-50/50 transition-colors">
+                                <td class="px-4 py-4">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-9 h-9 bg-gray-200 rounded-full flex items-center justify-center text-xl">
+                                            <span th:if="${c.iotDevice}">🤖</span>
+                                            <span th:unless="${c.iotDevice}">🚚</span>
+                                        </div>
+                                        <div>
+                                            <p class="font-semibold text-gray-800 text-sm" th:text="${c.name}">Nama</p>
+                                            <p class="text-gray-400 text-xs" th:text="${c.email}">email</p>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-4 py-4 font-mono text-gray-500 text-sm" th:text="${c.vehicleNumber}">-</td>
+                                <td class="px-4 py-4 text-gray-700 text-sm" th:text="${c.assignedArea}">-</td>
+                                <td class="px-4 py-4">
+                                    <span th:if="${c.available}" class="badge badge-confirmed">Tersedia</span>
+                                    <span th:unless="${c.available}" class="badge badge-pending">Sibuk/Off</span>
+                                </td>
+                                <td class="px-4 py-4 font-bold text-emerald-600 text-sm" th:text="${c.totalConfirmed}">0</td>
+                            </tr>
+                            <tr th:if="${collectors.content.empty}">
+                                <td colspan="5" class="py-8 text-center text-gray-400">Belum ada petugas</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div><!-- End Collectors Tab -->
+
+        <!-- =================== TAB: REDEMPTIONS =================== -->
+        <div x-show="activeTab === 'redemptions'" class="animate-in" style="display:none;">
+            <div class="card p-6">
+                <div class="flex items-center justify-between mb-6">
+                    <div>
+                        <h3 class="font-bold text-gray-800 text-lg">Persetujuan Penukaran Poin</h3>
+                        <p class="text-gray-400 text-sm">Validasi pengajuan warga yang ingin menukar poinnya.</p>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div th:each="r : ${redemptions.content}" class="border border-gray-200 rounded-2xl p-5 bg-white shadow-sm hover:shadow-md transition-all">
+                        <div class="flex justify-between items-start mb-3">
+                            <div>
+                                <h4 class="font-bold text-gray-900" th:text="${r.citizen.name}">Nama Warga</h4>
+                                <p class="text-xs text-gray-500" th:text="${#temporals.format(r.createdAt, 'dd MMM yyyy, HH:mm')}">Tgl</p>
+                            </div>
+                            <span class="bg-purple-100 text-purple-700 font-black px-3 py-1 rounded-lg text-sm" th:text="${#numbers.formatDecimal(r.pointsRedeemed, 1, 0)} + ' pts'">100 pts</span>
+                        </div>
+                        
+                        <div class="bg-gray-50 rounded-xl p-4 mb-4 border border-gray-100">
+                            <p class="text-xs text-gray-400 font-semibold mb-1">Permintaan Reward:</p>
+                            <p class="font-semibold text-gray-800 text-sm" th:text="${r.description}">Deskripsi</p>
+                        </div>
+
+                        <div class="flex gap-2">
+                            <form th:action="@{/admin/redemptions/{id}/approve(id=${r.id})}" method="POST" class="flex-1" onsubmit="const res=prompt('Catatan Admin (Opsional):'); if(res===null)return false; this.querySelector('input[name=adminNotes]').value=res;">
+                                <input type="hidden" name="adminNotes" value="">
+                                <button type="submit" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-2 rounded-xl text-sm transition-colors">
+                                    ✓ Setujui
+                                </button>
+                            </form>
+                            <form th:action="@{/admin/redemptions/{id}/reject(id=${r.id})}" method="POST" class="flex-1" onsubmit="const res=prompt('Alasan Penolakan:'); if(!res)return false; this.querySelector('input[name=adminNotes]').value=res;">
+                                <input type="hidden" name="adminNotes" value="">
+                                <button type="submit" class="w-full bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 font-bold py-2 rounded-xl text-sm transition-colors">
+                                    ✕ Tolak
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div th:if="${redemptions.content.empty}" class="col-span-full py-16 text-center bg-gray-50 rounded-3xl border-2 border-dashed border-gray-200">
+                        <div class="text-5xl mb-4">🎉</div>
+                        <h3 class="text-xl font-bold text-gray-800">Semua beres!</h3>
+                        <p class="text-gray-500 mt-2">Tidak ada permintaan penukaran yang menunggu saat ini.</p>
+                    </div>
+                </div>
+            </div>
+        </div><!-- End Redemptions Tab -->
+
+        <!-- =================== TAB: REPORTS =================== -->
+        <div x-show="activeTab === 'reports'" class="space-y-6 animate-in">
+            <div class="grid md:grid-cols-3 gap-4">
+                <div class="card p-6 text-center">
+                    <p class="text-4xl font-black text-emerald-600" th:text="${report.confirmedDeposits}">0</p>
+                    <p class="text-gray-400 text-sm mt-2">Setoran Dikonfirmasi</p>
+                </div>
+                <div class="card p-6 text-center">
+                    <p class="text-4xl font-black text-amber-500" th:text="${report.pendingDeposits}">0</p>
+                    <p class="text-gray-400 text-sm mt-2">Menunggu Konfirmasi</p>
+                </div>
+                <div class="card p-6 text-center">
+                    <p class="text-4xl font-black text-gray-800" th:text="${report.totalCollectors}">0</p>
+                    <p class="text-gray-400 text-sm mt-2">Total Petugas</p>
+                </div>
+            </div>
+            <div class="grid md:grid-cols-2 gap-6">
+                <div class="card p-6">
+                    <h3 class="font-bold text-gray-800 mb-4">Grafik Tren Setoran Bulanan</h3>
+                    <canvas id="reportChart" height="150"></canvas>
+                </div>
+                <div class="card p-6">
+                    <h3 class="font-bold text-gray-800 mb-4">Distribusi Berat per Kategori</h3>
+                    <canvas id="categoryChart" height="150"></canvas>
+                </div>
+            </div>
+        </div><!-- End Reports Tab -->
+
+    </div><!-- end p-6 -->
+</div><!-- end main-content -->
+
+<!-- ===== MODAL: GANTI PASSWORD ===== -->
+<div x-show="showPasswordModal" style="display:none;" x-transition class="fixed inset-0 bg-gray-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div @click.away="showPasswordModal=false" class="bg-white rounded-3xl shadow-2xl w-full max-w-lg p-8">
+        <div class="flex items-center justify-between mb-6">
+            <div>
+                <h3 class="text-xl font-black text-gray-900">🔑 Ganti Password</h3>
+            </div>
+            <button @click="showPasswordModal=false" class="w-9 h-9 bg-gray-100 hover:bg-gray-200 rounded-xl flex items-center justify-center text-gray-500 transition-colors">✕</button>
+        </div>
+        <form th:action="@{/user/change-password}" method="POST" class="space-y-4" onsubmit="return document.getElementById('newPwA').value === document.getElementById('confirmPwA').value;">
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-1">Password Lama</label>
+                <input type="password" name="oldPassword" required class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-emerald-500">
+            </div>
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-1">Password Baru</label>
+                <input type="password" id="newPwA" name="newPassword" required minlength="6" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-emerald-500">
+            </div>
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-1">Konfirmasi Password Baru</label>
+                <input type="password" id="confirmPwA" required minlength="6" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-emerald-500">
+                <p class="text-xs text-red-500 mt-1 hidden" id="pwMatchErrorA">Password tidak cocok!</p>
+            </div>
+            <div class="flex gap-3 mt-4">
+                <button type="button" @click="showPasswordModal=false" class="flex-1 bg-gray-100 text-gray-600 font-bold py-3.5 rounded-xl text-sm hover:bg-gray-200 transition-colors">Batal</button>
+                <button type="submit" class="flex-1 bg-emerald-500 text-white font-bold py-3.5 rounded-xl text-sm hover:shadow-lg hover:bg-emerald-600 transition-all">Simpan Password</button>
+            </div>
+        </form>
+        <script>
+            document.getElementById('confirmPwA').addEventListener('input', function() {
+                const pw1 = document.getElementById('newPwA').value;
+                const pw2 = this.value;
+                const error = document.getElementById('pwMatchErrorA');
+                if(pw1 !== pw2) {
+                    error.classList.remove('hidden');
+                } else {
+                    error.classList.add('hidden');
+                }
+            });
+        </script>
+    </div>
+</div>
+
+<!-- Chart.js Inline Data from Thymeleaf -->
+<script th:inline="javascript">
+    // Monthly stats data array from Thymeleaf model
+    const monthlyStats = /*[[${report.monthlyStats}]]*/ [];
+
+    function adminDashboard() {
+        const urlParams = new URLSearchParams(window.location.search);
+        return {
+            activeTab: urlParams.get('activeTab') || 'overview',
+            showAddCategoryModal: false,
+            showImportModal: false,
+            showPasswordModal: false,
+            tabTitle() {
+                const titles = {
+                    overview: 'Ringkasan Dashboard',
+                    citizens: 'Manajemen Warga',
+                    deposits: 'Setoran Sampah',
+                    categories: 'Kategori Sampah',
+                    collectors: 'Manajemen Petugas',
+                    redemptions: 'Persetujuan Penukaran',
+                    reports: 'Laporan & Grafik'
+                };
+                return titles[this.activeTab] || 'Dashboard';
+            }
+        }
+    }
+
+    // Initialize Charts after DOM loaded
+    document.addEventListener('DOMContentLoaded', function () {
+        const labels = monthlyStats.map(s => s.monthYear || '');
+        const depositCounts = monthlyStats.map(s => s.depositCount || 0);
+        const weights = monthlyStats.map(s => s.totalWeightKg || 0);
+
+        const chartDefaults = {
+            responsive: true,
+            plugins: {
+                legend: { display: true, position: 'top' }
+            },
+            scales: {
+                x: { grid: { display: false } },
+                y: { grid: { color: 'rgba(0,0,0,0.05)' } }
+            }
+        };
+
+        // Monthly Chart (on overview tab)
+        const ctx1 = document.getElementById('monthlyChart');
+        if (ctx1) {
+            new Chart(ctx1, {
+                type: 'bar',
+                data: {
+                    labels: labels.length > 0 ? labels : ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun'],
+                    datasets: [
+                        {
+                            label: 'Jumlah Setoran',
+                            data: depositCounts.length > 0 ? depositCounts : [12, 25, 18, 32, 28, 41],
+                            backgroundColor: 'rgba(16,185,129,0.8)',
+                            borderRadius: 8,
+                            borderSkipped: false,
+                        },
+                        {
+                            label: 'Berat (kg)',
+                            data: weights.length > 0 ? weights : [8.5, 15.2, 11.3, 22.6, 19.4, 28.7],
+                            backgroundColor: 'rgba(16,185,129,0.2)',
+                            borderColor: 'rgba(16,185,129,0.8)',
+                            borderWidth: 2,
+                            type: 'line',
+                            fill: true,
+                            tension: 0.4,
+                            pointBackgroundColor: '#10b981',
+                            pointRadius: 4,
+                        }
+                    ]
+                },
+                options: chartDefaults
+            });
+        }
+
+        // Report Chart (on reports tab)
+        const ctx2 = document.getElementById('reportChart');
+        if (ctx2) {
+            new Chart(ctx2, {
+                type: 'line',
+                data: {
+                    labels: labels.length > 0 ? labels : ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun'],
+                    datasets: [{
+                        label: 'Total Poin Disebar',
+                        data: monthlyStats.map(s => s.totalPoints || 0).length > 0
+                            ? monthlyStats.map(s => s.totalPoints || 0)
+                            : [120, 250, 190, 350, 280, 420],
+                        borderColor: '#10b981',
+                        backgroundColor: 'rgba(16,185,129,0.1)',
+                        fill: true,
+                        tension: 0.4,
+                        pointBackgroundColor: '#059669',
+                        pointRadius: 5,
+                    }]
+                },
+                options: chartDefaults
+            });
+        }
+
+        // Category Breakdown Chart
+        const catStats = /*[[${report.weightByCategory}]]*/ {};
+        const ctx3 = document.getElementById('categoryChart');
+        if (ctx3 && Object.keys(catStats).length > 0) {
+            new Chart(ctx3, {
+                type: 'doughnut',
+                data: {
+                    labels: Object.keys(catStats),
+                    datasets: [{
+                        data: Object.values(catStats),
+                        backgroundColor: [
+                            '#10b981', '#3b82f6', '#f59e0b', '#ef4444', '#8b5cf6'
+                        ],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { position: 'bottom' }
+                    },
+                    cutout: '70%'
+                }
+            });
+        }
+    });
+</script>
+
+</body>
+</html>
