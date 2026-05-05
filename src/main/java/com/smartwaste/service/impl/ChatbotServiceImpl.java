@@ -27,15 +27,25 @@ import java.util.UUID;
  *
  * <p>Setiap percakapan disimpan ke database {@link ChatLog} untuk audit trail.</p>
  */
-@Slf4j
 @Service
-@RequiredArgsConstructor
 public class ChatbotServiceImpl implements ChatbotService {
+
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ChatbotServiceImpl.class);
 
     private final ChatLogRepository chatLogRepository;
     private final CitizenRepository citizenRepository;
     private final OkHttpClient httpClient;
     private final ObjectMapper objectMapper;
+
+    public ChatbotServiceImpl(ChatLogRepository chatLogRepository,
+                              CitizenRepository citizenRepository,
+                              OkHttpClient httpClient,
+                              ObjectMapper objectMapper) {
+        this.chatLogRepository = chatLogRepository;
+        this.citizenRepository = citizenRepository;
+        this.httpClient = httpClient;
+        this.objectMapper = objectMapper;
+    }
 
     @Value("${app.mistral.api-key}")
     private String mistralApiKey;

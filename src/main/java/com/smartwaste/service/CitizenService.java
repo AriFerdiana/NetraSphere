@@ -14,6 +14,7 @@ public interface CitizenService {
     Page<CitizenProfileResponse> searchCitizens(String keyword, Pageable pageable);
     CitizenProfileResponse updateProfile(String citizenId, String name, String phone, String address);
     void deactivateCitizen(String citizenId);
+    void toggleCitizenActive(String citizenId);
     long countActive();
     void importCitizensFromCsv(org.springframework.web.multipart.MultipartFile file);
 }

@@ -2,12 +2,10 @@ package com.smartwaste.dto.request;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import lombok.Data;
 
 /**
- * DTO untuk request login (semua role: Admin, Citizen, Collector).
+ * DTO untuk request login.
  */
-@Data
 public class LoginRequest {
 
     @NotBlank(message = "Email tidak boleh kosong")
@@ -16,4 +14,11 @@ public class LoginRequest {
 
     @NotBlank(message = "Password tidak boleh kosong")
     private String password;
+
+    public LoginRequest() {}
+
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
+    public String getPassword() { return password; }
+    public void setPassword(String password) { this.password = password; }
 }

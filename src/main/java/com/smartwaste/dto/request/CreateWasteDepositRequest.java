@@ -1,12 +1,10 @@
 package com.smartwaste.dto.request;
 
 import jakarta.validation.constraints.*;
-import lombok.Data;
 
 /**
  * DTO untuk membuat setoran sampah baru dari UI citizen.
  */
-@Data
 public class CreateWasteDepositRequest {
 
     @NotBlank(message = "Kategori sampah harus dipilih")
@@ -21,4 +19,15 @@ public class CreateWasteDepositRequest {
     private String notes;
 
     private String imageUrl;
+
+    public CreateWasteDepositRequest() {}
+
+    public String getCategoryId() { return categoryId; }
+    public void setCategoryId(String categoryId) { this.categoryId = categoryId; }
+    public Double getWeightKg() { return weightKg; }
+    public void setWeightKg(Double weightKg) { this.weightKg = weightKg; }
+    public String getNotes() { return notes; }
+    public void setNotes(String notes) { this.notes = notes; }
+    public String getImageUrl() { return imageUrl; }
+    public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
 }

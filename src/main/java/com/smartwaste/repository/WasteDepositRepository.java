@@ -21,7 +21,11 @@ public interface WasteDepositRepository extends JpaRepository<WasteDeposit, Stri
 
     Page<WasteDeposit> findByCitizen(Citizen citizen, Pageable pageable);
 
+    Page<WasteDeposit> findByCollector(com.smartwaste.entity.Collector collector, Pageable pageable);
+
     Page<WasteDeposit> findByCitizenAndStatus(Citizen citizen, DepositStatus status, Pageable pageable);
+
+    long countByCitizenAndStatus(Citizen citizen, DepositStatus status);
 
     Page<WasteDeposit> findByStatus(DepositStatus status, Pageable pageable);
 
@@ -65,5 +69,17 @@ public interface WasteDepositRepository extends JpaRepository<WasteDeposit, Stri
     /** Total setoran per status per collector */
     long countByCollectorAndStatus(com.smartwaste.entity.Collector collector, DepositStatus status);
 
+    /** Total berat sampah yang dikonfirmasi oleh collector hari ini */
+    @Query("SELECT COALESCE(SUM(d.weightKg), 0) FROM WasteDeposit d WHERE d.collector = :collector AND d.status = com.smartwaste.entity.enums.DepositStatus.CONFIRMED AND d.confirmedAt >= :startOfDay AND d.confirmedAt <= :endOfDay")
+    double sumTodayWeightByCollector(@Param("collector") com.smartwaste.entity.Collector collector, @Param("startOfDay") java.time.LocalDateTime startOfDay, @Param("endOfDay") java.time.LocalDateTime endOfDay);
+
+    /** Statistik per kategori untuk collector tertentu */
+    @Query("SELECT d.category.name, SUM(d.weightKg), COUNT(d) " +
+           "FROM WasteDeposit d WHERE d.collector = :collector AND d.status = com.smartwaste.entity.enums.DepositStatus.CONFIRMED " +
+           "GROUP BY d.category.name")
+    List<Object[]> findCategoryStatsByCollector(@Param("collector") com.smartwaste.entity.Collector collector);
+
     Page<WasteDeposit> findByCreatedAtBetween(java.time.LocalDateTime start, java.time.LocalDateTime end, Pageable pageable);
+    
+    Page<WasteDeposit> findByStatusAndCreatedAtBetween(DepositStatus status, java.time.LocalDateTime start, java.time.LocalDateTime end, Pageable pageable);
 }

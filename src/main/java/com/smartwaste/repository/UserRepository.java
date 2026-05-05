@@ -3,8 +3,10 @@ package com.smartwaste.repository;
 import com.smartwaste.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -23,4 +25,10 @@ public interface UserRepository extends JpaRepository<User, String> {
     /** Mencari user aktif berdasarkan email. */
     @Query("SELECT u FROM User u WHERE u.email = :email AND u.active = true")
     Optional<User> findActiveByEmail(String email);
+
+    @Query(value = "SELECT u.id, u.name, u.email, u.user_type FROM users u WHERE u.email != :myEmail AND u.user_type != 'CITIZEN'", nativeQuery = true)
+    List<Object[]> findChatUsersForCitizen(@Param("myEmail") String myEmail);
+
+    @Query(value = "SELECT u.id, u.name, u.email, u.user_type FROM users u WHERE u.email != :myEmail", nativeQuery = true)
+    List<Object[]> findAllChatUsersExcept(@Param("myEmail") String myEmail);
 }

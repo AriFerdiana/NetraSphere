@@ -2,12 +2,10 @@ package com.smartwaste.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-import lombok.Data;
 
 /**
  * DTO untuk request percakapan dengan AI Chatbot Mistral.
  */
-@Data
 public class ChatRequest {
 
     @NotBlank(message = "Pesan tidak boleh kosong")
@@ -19,4 +17,13 @@ public class ChatRequest {
 
     /** Identifier anonim untuk pengguna yang belum login */
     private String anonymousIdentifier;
+
+    public ChatRequest() {}
+
+    public String getMessage() { return message; }
+    public void setMessage(String message) { this.message = message; }
+    public String getSessionId() { return sessionId; }
+    public void setSessionId(String sessionId) { this.sessionId = sessionId; }
+    public String getAnonymousIdentifier() { return anonymousIdentifier; }
+    public void setAnonymousIdentifier(String anonymousIdentifier) { this.anonymousIdentifier = anonymousIdentifier; }
 }

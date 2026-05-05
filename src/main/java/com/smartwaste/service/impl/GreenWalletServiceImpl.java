@@ -32,15 +32,23 @@ import org.springframework.transaction.annotation.Transactional;
  * </pre>
  * </p>
  */
-@Slf4j
 @Service
-@RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class GreenWalletServiceImpl implements GreenWalletService {
+
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(GreenWalletServiceImpl.class);
 
     private final CitizenRepository citizenRepository;
     private final GreenWalletRepository walletRepository;
     private final PointRedemptionRepository redemptionRepository;
+
+    public GreenWalletServiceImpl(CitizenRepository citizenRepository,
+                                  GreenWalletRepository walletRepository,
+                                  PointRedemptionRepository redemptionRepository) {
+        this.citizenRepository = citizenRepository;
+        this.walletRepository = walletRepository;
+        this.redemptionRepository = redemptionRepository;
+    }
 
     @Override
     public WalletResponse getMyWallet(String citizenEmail) {

@@ -18,12 +18,13 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/admin")
-@RequiredArgsConstructor
-@Tag(name = "Admin Operations", description = "Endpoint khusus Admin")
-@SecurityRequirement(name = "bearerAuth")
 public class AdminController {
 
     private final CollectorService collectorService;
+
+    public AdminController(CollectorService collectorService) {
+        this.collectorService = collectorService;
+    }
 
     @PostMapping("/collectors")
     @PreAuthorize("hasRole('ADMIN')")

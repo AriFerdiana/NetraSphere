@@ -35,7 +35,6 @@ import java.util.List;
  */
 @Getter
 @Setter
-@NoArgsConstructor
 @Entity
 @Table(name = "citizens")
 @DiscriminatorValue("CITIZEN")
@@ -148,4 +147,31 @@ public class Citizen extends User {
         this.deposits.add(deposit);
         deposit.setCitizen(this);
     }
+    /**
+     * Manual No-args constructor to ensure compilation.
+     */
+    public Citizen() {
+        super();
+        this.deposits = new ArrayList<>();
+        this.redemptions = new ArrayList<>();
+        this.chatLogs = new ArrayList<>();
+    }
+
+    // ==================== Manual Getters/Setters ====================
+    public String getNik() { return nik; }
+    public void setNik(String nik) { this.nik = nik; }
+    public String getAddress() { return address; }
+    public void setAddress(String address) { this.address = address; }
+    public String getRtRw() { return rtRw; }
+    public void setRtRw(String rtRw) { this.rtRw = rtRw; }
+    public String getKelurahan() { return kelurahan; }
+    public void setKelurahan(String kelurahan) { this.kelurahan = kelurahan; }
+    public GreenWallet getWallet() { return wallet; }
+    public void setWallet(GreenWallet wallet) { this.wallet = wallet; }
+    public List<WasteDeposit> getDeposits() { return deposits; }
+    public void setDeposits(List<WasteDeposit> deposits) { this.deposits = deposits; }
+    public List<PointRedemption> getRedemptions() { return redemptions; }
+    public void setRedemptions(List<PointRedemption> redemptions) { this.redemptions = redemptions; }
+    public List<ChatLog> getChatLogs() { return chatLogs; }
+    public void setChatLogs(List<ChatLog> chatLogs) { this.chatLogs = chatLogs; }
 }

@@ -22,7 +22,6 @@ import static com.smartwaste.entity.enums.DepositStatus.*;
  * Implementasi service laporan administratif.
  */
 @Service
-@RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class ReportServiceImpl implements ReportService {
 
@@ -30,6 +29,16 @@ public class ReportServiceImpl implements ReportService {
     private final CollectorRepository collectorRepository;
     private final WasteDepositRepository depositRepository;
     private final GreenWalletRepository walletRepository;
+
+    public ReportServiceImpl(CitizenRepository citizenRepository,
+                             CollectorRepository collectorRepository,
+                             WasteDepositRepository depositRepository,
+                             GreenWalletRepository walletRepository) {
+        this.citizenRepository = citizenRepository;
+        this.collectorRepository = collectorRepository;
+        this.depositRepository = depositRepository;
+        this.walletRepository = walletRepository;
+    }
 
     @Override
     public ReportSummaryResponse getSummary() {
@@ -59,12 +68,17 @@ public class ReportServiceImpl implements ReportService {
         citizenRepository.findTopByPoints(PageRequest.of(0, 5)).forEach(c -> {
             GreenWallet w = walletRepository.findByCitizen(c).orElse(null);
             double pts = w != null ? w.getTotalPoints() : 0;
-            long deps = depositRepository.findByCitizen(c, Pageable.unpaged()).getTotalElements();
+            long deps = depositRepository.countByCitizenAndStatus(c, CONFIRMED);
+            double weight = depositRepository.sumWeightByCitizen(c);
+            String level = getEcoLevel(pts);
+            
             topCitizens.add(ReportSummaryResponse.CitizenLeaderboard.builder()
                     .name(c.getName())
                     .totalPoints(pts)
                     .totalDeposits(deps)
-                    .level(getEcoLevel(pts))
+                    .totalWeightKg(weight)
+                    .level(level)
+                    .badgeIcon(getBadgeForLevel(level))
                     .build());
         });
 
@@ -98,5 +112,13 @@ public class ReportServiceImpl implements ReportService {
         if (pts >= 1000)  return "Silver Green Star";
         if (pts >= 500)   return "Bronze Recycler";
         return "Green Starter";
+    }
+
+    private String getBadgeForLevel(String level) {
+        if (level.contains("Platinum")) return "🛡️";
+        if (level.contains("Gold")) return "🏆";
+        if (level.contains("Silver")) return "💎";
+        if (level.contains("Bronze")) return "🌟";
+        return "🌱";
     }
 }

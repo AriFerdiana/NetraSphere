@@ -13,12 +13,13 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/reports")
-@RequiredArgsConstructor
-@Tag(name = "Reports", description = "Laporan dan statistik sistem (Admin)")
-@SecurityRequirement(name = "bearerAuth")
 public class ReportController {
 
     private final ReportService reportService;
+
+    public ReportController(ReportService reportService) {
+        this.reportService = reportService;
+    }
 
     @GetMapping("/summary")
     @PreAuthorize("hasAnyRole('ADMIN', 'COLLECTOR')")

@@ -31,8 +31,21 @@ public interface CollectorRepository extends JpaRepository<Collector, String> {
 
     Page<Collector> findByActiveTrue(Pageable pageable);
 
+    /**
+     * Leaderboard collector berdasarkan jumlah setoran yang dikonfirmasi.
+     * Menggunakan correlated subquery agar enum-safe dan kompatibel dengan MySQL strict mode.
+     * Hanya menampilkan collector aktif (bukan perangkat IoT).
+     */
+    @Query("SELECT c, (SELECT COUNT(d) FROM WasteDeposit d " +
+           "           WHERE d.collector = c " +
+           "           AND d.status = com.smartwaste.entity.enums.DepositStatus.CONFIRMED) AS confirmedCount " +
+           "FROM Collector c " +
+           "WHERE c.active = true AND c.iotDevice = false " +
+           "ORDER BY confirmedCount DESC")
+    List<Object[]> getCollectorLeaderboard();
+
     @Query("SELECT c FROM Collector c WHERE c.active = true AND c.iotDevice = false AND " +
            "(LOWER(c.name) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
            " LOWER(c.email) LIKE LOWER(CONCAT('%', :keyword, '%')))")
-    Page<Collector> searchCollectors(@Param("keyword") String keyword, Pageable pageable);
+    Page<Collector> searchCollectors(@org.springframework.data.repository.query.Param("keyword") String keyword, org.springframework.data.domain.Pageable pageable);
 }

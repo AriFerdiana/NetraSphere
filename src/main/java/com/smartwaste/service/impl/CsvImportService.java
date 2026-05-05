@@ -17,12 +17,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-@RequiredArgsConstructor
 public class CsvImportService {
 
     private final CitizenRepository citizenRepository;
     private final GreenWalletRepository greenWalletRepository;
     private final PasswordEncoder passwordEncoder;
+
+    public CsvImportService(CitizenRepository citizenRepository,
+                            GreenWalletRepository greenWalletRepository,
+                            PasswordEncoder passwordEncoder) {
+        this.citizenRepository = citizenRepository;
+        this.greenWalletRepository = greenWalletRepository;
+        this.passwordEncoder = passwordEncoder;
+    }
 
     @Transactional
     public String importCitizens(MultipartFile file) {

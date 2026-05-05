@@ -18,7 +18,7 @@ public interface WasteDepositService {
     WasteDepositResponse createIoTDeposit(IoTDepositRequest request);
 
     /** Collector mengkonfirmasi setoran → poin dikreditkan ke wallet */
-    WasteDepositResponse confirmDeposit(String depositId, String collectorEmail);
+    WasteDepositResponse confirmDeposit(String depositId, String collectorEmail, String pickupProofUrl);
 
     /** Collector menolak setoran */
     WasteDepositResponse rejectDeposit(String depositId, String collectorEmail, String reason);
@@ -27,13 +27,27 @@ public interface WasteDepositService {
     Page<WasteDepositResponse> getMyDeposits(String citizenEmail, Pageable pageable);
 
     /** Semua setoran (admin/collector view) dengan filter tanggal opsional */
-    Page<WasteDepositResponse> getAllDeposits(java.time.LocalDateTime startDate, java.time.LocalDateTime endDate, Pageable pageable);
+    Page<WasteDepositResponse> getAllDeposits(java.time.LocalDateTime startDate, java.time.LocalDateTime endDate, String status, Pageable pageable);
 
     /** Setoran yang pending (untuk collector) */
     Page<WasteDepositResponse> getPendingDeposits(Pageable pageable);
 
     WasteDepositResponse getById(String depositId);
 
+    /** Riwayat setoran untuk collector (termasuk yang confirmed dan rejected) */
+    Page<WasteDepositResponse> getCollectorHistory(String collectorEmail, Pageable pageable);
+
     long countByCollector(com.smartwaste.entity.Collector collector);
     long countByCollectorAndStatus(com.smartwaste.entity.Collector collector, com.smartwaste.entity.enums.DepositStatus status);
+
+    double getTodayWeightByCollector(String collectorEmail);
+
+    /** Jumlah setoran PENDING (untuk polling auto-refresh) */
+    long countPendingDeposits();
+
+    /** Statistik kategori untuk Collector */
+    java.util.List<Object[]> getCategoryStatsByCollector(String collectorEmail);
+
+    /** Mencatat setoran manual oleh Collector secara langsung (tanpa aplikasi warga) */
+    void createManualDeposit(String collectorEmail, String citizenId, String categoryId, double weightKg, String notes);
 }

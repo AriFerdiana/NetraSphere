@@ -24,7 +24,6 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-@NoArgsConstructor
 @Entity
 @Table(name = "point_redemptions",
        indexes = {
@@ -32,6 +31,10 @@ import lombok.Setter;
            @Index(name = "idx_redemption_status", columnList = "status")
        })
 public class PointRedemption extends BaseEntity {
+
+    public PointRedemption() {
+        super();
+    }
 
     /**
      * Warga pemilik poin yang melakukan penukaran.
@@ -86,4 +89,16 @@ public class PointRedemption extends BaseEntity {
         this.description = description;
         this.status = RedemptionStatus.PENDING;
     }
+    public Citizen getCitizen() { return citizen; }
+    public void setCitizen(Citizen citizen) { this.citizen = citizen; }
+    public double getPointsRedeemed() { return pointsRedeemed; }
+    public void setPointsRedeemed(double pointsRedeemed) { this.pointsRedeemed = pointsRedeemed; }
+    public RedemptionStatus getStatus() { return status; }
+    public void setStatus(RedemptionStatus status) { this.status = status; }
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
+    public String getRewardCode() { return rewardCode; }
+    public void setRewardCode(String rewardCode) { this.rewardCode = rewardCode; }
+    public String getAdminNotes() { return adminNotes; }
+    public void setAdminNotes(String adminNotes) { this.adminNotes = adminNotes; }
 }

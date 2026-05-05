@@ -24,16 +24,26 @@ import org.springframework.transaction.annotation.Transactional;
  * Mengimplementasikan {@link CollectorService} dan meng-override semua method yang
  * didefinisikan di interface tersebut.</p>
  */
-@Slf4j
 @Service
-@RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class CollectorServiceImpl implements CollectorService {
+
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(CollectorServiceImpl.class);
 
     private final CollectorRepository collectorRepository;
     private final UserRepository userRepository;
     private final WasteDepositRepository depositRepository;
     private final PasswordEncoder passwordEncoder;
+
+    public CollectorServiceImpl(CollectorRepository collectorRepository,
+                                UserRepository userRepository,
+                                WasteDepositRepository depositRepository,
+                                PasswordEncoder passwordEncoder) {
+        this.collectorRepository = collectorRepository;
+        this.userRepository = userRepository;
+        this.depositRepository = depositRepository;
+        this.passwordEncoder = passwordEncoder;
+    }
 
     @Override
     @Transactional

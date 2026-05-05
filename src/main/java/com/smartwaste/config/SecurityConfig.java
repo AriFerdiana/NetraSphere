@@ -36,11 +36,15 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
-@RequiredArgsConstructor
 public class SecurityConfig {
 
     private final JwtAuthFilter jwtAuthFilter;
     private final UserDetailsService userDetailsService;
+
+    public SecurityConfig(JwtAuthFilter jwtAuthFilter, UserDetailsService userDetailsService) {
+        this.jwtAuthFilter = jwtAuthFilter;
+        this.userDetailsService = userDetailsService;
+    }
 
     // ==================== Filter Chain 1: REST API (Stateless JWT) ====================
 
@@ -85,7 +89,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain webSecurityFilterChain(HttpSecurity http) throws Exception {
         http
-            .csrf(csrf -> csrf.ignoringRequestMatchers("/api/**"))
+            .csrf(csrf -> csrf.ignoringRequestMatchers("/api/**", "/internal/**"))
             .authorizeHttpRequests(auth -> auth
                 // Halaman publik
                 .requestMatchers("/", "/auth/**", "/css/**", "/js/**", "/images/**",
@@ -96,6 +100,8 @@ public class SecurityConfig {
                 .requestMatchers("/citizen/**").hasRole("CITIZEN")
                 // Halaman collector
                 .requestMatchers("/collector/**").hasRole("COLLECTOR")
+                // API Internal (Session-based)
+                .requestMatchers("/internal/**").authenticated()
                 // Semua halaman lain harus login
                 .anyRequest().authenticated()
             )

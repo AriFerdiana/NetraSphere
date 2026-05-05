@@ -35,12 +35,16 @@ import java.util.List;
  */
 @Getter
 @Setter
-@NoArgsConstructor
 @Entity
 @Table(name = "collectors")
 @DiscriminatorValue("COLLECTOR")
 @PrimaryKeyJoinColumn(name = "user_id")
 public class Collector extends User {
+
+    public Collector() {
+        super();
+        this.confirmedDeposits = new ArrayList<>();
+    }
 
     /**
      * Nomor kendaraan pengangkut sampah petugas (atau ID robot untuk IoT).
@@ -76,6 +80,12 @@ public class Collector extends User {
      */
     @Column(name = "iot_device_id", unique = true, length = 50)
     private String iotDeviceId;
+
+    @Column(name = "max_capacity_kg")
+    private Double maxCapacityKg = 500.0;
+
+    @Column(name = "current_load_kg")
+    private Double currentLoadKg = 0.0;
 
     // ==================== Relasi ====================
 
@@ -138,4 +148,21 @@ public class Collector extends User {
     public String getRole() {
         return "COLLECTOR";
     }
+    // ==================== Manual Getters/Setters ====================
+    public String getVehicleNumber() { return vehicleNumber; }
+    public void setVehicleNumber(String vehicleNumber) { this.vehicleNumber = vehicleNumber; }
+    public String getAssignedArea() { return assignedArea; }
+    public void setAssignedArea(String assignedArea) { this.assignedArea = assignedArea; }
+    public boolean isAvailable() { return available; }
+    public void setAvailable(boolean available) { this.available = available; }
+    public boolean isIotDevice() { return iotDevice; }
+    public void setIotDevice(boolean iotDevice) { this.iotDevice = iotDevice; }
+    public String getIotDeviceId() { return iotDeviceId; }
+    public void setIotDeviceId(String iotDeviceId) { this.iotDeviceId = iotDeviceId; }
+    public Double getMaxCapacityKg() { return maxCapacityKg; }
+    public void setMaxCapacityKg(Double maxCapacityKg) { this.maxCapacityKg = maxCapacityKg; }
+    public Double getCurrentLoadKg() { return currentLoadKg; }
+    public void setCurrentLoadKg(Double currentLoadKg) { this.currentLoadKg = currentLoadKg; }
+    public List<WasteDeposit> getConfirmedDeposits() { return confirmedDeposits; }
+    public void setConfirmedDeposits(List<WasteDeposit> confirmedDeposits) { this.confirmedDeposits = confirmedDeposits; }
 }

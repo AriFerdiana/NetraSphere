@@ -15,11 +15,13 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/chat")
-@RequiredArgsConstructor
-@Tag(name = "AI Chatbot", description = "Integrasi chatbot Mistral AI untuk panduan daur ulang")
 public class ChatbotController {
 
     private final ChatbotService chatbotService;
+
+    public ChatbotController(ChatbotService chatbotService) {
+        this.chatbotService = chatbotService;
+    }
 
     /** Chat dengan login (citizen) */
     @PostMapping

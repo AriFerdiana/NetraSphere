@@ -71,7 +71,10 @@ public abstract class BaseEntity {
             this.id = UUID.randomUUID().toString();
         }
         LocalDateTime now = LocalDateTime.now();
-        this.createdAt = now;
+        // Hanya set jika belum di-override (misal oleh seeder yang men-backdate data)
+        if (this.createdAt == null) {
+            this.createdAt = now;
+        }
         this.updatedAt = now;
     }
 
@@ -83,4 +86,11 @@ public abstract class BaseEntity {
     protected void onUpdate() {
         this.updatedAt = LocalDateTime.now();
     }
+
+    public String getId() { return id; }
+    public void setId(String id) { this.id = id; }
+    public LocalDateTime getCreatedAt() { return createdAt; }
+    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+    public LocalDateTime getUpdatedAt() { return updatedAt; }
+    public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
 }

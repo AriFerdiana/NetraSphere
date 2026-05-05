@@ -15,8 +15,8 @@ import java.nio.file.StandardCopyOption;
 import java.util.UUID;
 
 @Service
-@Slf4j
 public class FileStorageService {
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(FileStorageService.class);
 
     private final Path fileStorageLocation;
 

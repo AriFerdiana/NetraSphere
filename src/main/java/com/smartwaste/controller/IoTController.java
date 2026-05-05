@@ -33,11 +33,13 @@ import org.springframework.web.bind.annotation.*;
  */
 @RestController
 @RequestMapping("/api/v1/iot")
-@RequiredArgsConstructor
-@Tag(name = "IoT Integration", description = "Endpoint khusus untuk robot/smart bin NetraDUMP")
 public class IoTController {
 
     private final WasteDepositService depositService;
+
+    public IoTController(WasteDepositService depositService) {
+        this.depositService = depositService;
+    }
 
     @Value("${app.iot.api-key}")
     private String validIoTApiKey;

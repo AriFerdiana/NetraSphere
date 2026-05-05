@@ -3,12 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smart Community Waste System — Trinetra</title>
+    <title>NetraSphere - Smart Waste System by TriNetra</title>
     <meta name="description" content="Sistem Pengelolaan Sampah Komunitas Cerdas dengan gamifikasi Green Wallet, integrasi IoT robot NetraDUMP, dan AI Chatbot Mistral.">
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
     <script>
         tailwind.config = {
             theme: {
@@ -55,7 +56,7 @@
         <div class="flex items-center justify-between h-16">
             <div class="flex items-center gap-3">
                 <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-emerald-400 to-green-600 flex items-center justify-center text-white font-bold text-sm">♻</div>
-                <span class="font-bold text-emerald-300 text-lg">SmartWaste</span>
+                <span class="font-bold text-emerald-300 text-lg">NetraSphere</span>
                 <span class="hidden md:block text-xs text-emerald-500 bg-emerald-950 px-2 py-0.5 rounded-full">by Trinetra</span>
             </div>
             <div class="hidden md:flex items-center gap-8">
@@ -87,7 +88,7 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 relative z-10">
         <div class="grid lg:grid-cols-2 gap-12 items-center">
             <!-- Left Content -->
-            <div class="text-center lg:text-left">
+            <div class="text-center lg:text-left" data-aos="fade-right">
                 <div class="inline-flex items-center gap-2 bg-emerald-900/60 border border-emerald-700/50 text-emerald-300 text-xs font-semibold px-4 py-2 rounded-full mb-6 backdrop-blur-sm">
                     <span class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></span>
                     IoT-Ready • AI-Powered • Gamified
@@ -130,7 +131,7 @@
             </div>
 
             <!-- Right: Floating Dashboard Preview -->
-            <div class="hidden lg:flex justify-center">
+            <div class="hidden lg:flex justify-center" data-aos="fade-left">
                 <div class="glass rounded-3xl p-6 w-full max-w-md shadow-2xl" style="animation: float 6s ease-in-out infinite;">
                     <!-- Mock Dashboard Card -->
                     <div class="text-xs text-emerald-400 font-semibold mb-4 flex items-center gap-2">
@@ -215,41 +216,40 @@
     </div>
 </section>
 
-<!-- ===== FEATURES SECTION ===== -->
-<section id="features" class="bg-gray-950 py-24">
+<!-- ===== FITUR UNGGULAN ===== -->
+<section id="features" class="py-24 bg-white relative">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="text-center mb-16">
-            <span class="text-emerald-500 text-sm font-bold uppercase tracking-widest">Kenapa SmartWaste?</span>
-            <h2 class="text-4xl font-black text-white mt-3">Teknologi Level <span class="text-gradient">Enterprise</span></h2>
-            <p class="text-gray-400 mt-4 max-w-2xl mx-auto">Bukan sekadar CRUD — platform ini dirancang untuk skala komunitas nyata dengan arsitektur microservice-ready.</p>
+        <div class="text-center max-w-2xl mx-auto mb-16" data-aos="fade-up">
+            <span class="text-emerald-500 text-sm font-bold uppercase tracking-widest">Kenapa NetraSphere?</span>
+            <h2 class="text-4xl font-black text-gray-900 mt-3">Teknologi Level <span class="text-gradient">Enterprise</span></h2>
+            <p class="text-gray-600 mt-4 max-w-2xl mx-auto">Bukan sekadar CRUD — platform ini dirancang untuk skala komunitas nyata dengan arsitektur microservice-ready.</p>
         </div>
-        <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             <!-- Feature 1 -->
-            <div class="group glass-light rounded-2xl p-6 card-hover border border-emerald-100">
+            <div class="bg-gray-50 rounded-3xl p-8 hover:shadow-2xl hover:bg-emerald-50 transition-all group" data-aos="fade-up" data-aos-delay="100">
                 <div class="w-12 h-12 bg-emerald-100 rounded-xl flex items-center justify-center text-2xl mb-4 group-hover:scale-110 transition-transform">🔐</div>
                 <h3 class="font-bold text-gray-900 mb-2">RBAC Tiga Peran</h3>
                 <p class="text-gray-500 text-sm">Admin, Citizen, Collector — setiap role punya akses berbeda. Diperkuat JWT + Spring Security.</p>
             </div>
             <!-- Feature 2 -->
-            <div class="group glass-light rounded-2xl p-6 card-hover border border-emerald-100">
+            <div class="bg-gray-50 rounded-3xl p-8 hover:shadow-2xl hover:bg-emerald-50 transition-all group" data-aos="fade-up" data-aos-delay="200">
                 <div class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center text-2xl mb-4 group-hover:scale-110 transition-transform">💚</div>
                 <h3 class="font-bold text-gray-900 mb-2">Green Wallet</h3>
                 <p class="text-gray-500 text-sm">Setiap setoran menghasilkan poin. Tiga multiplier berdasarkan jenis sampah: 1x, 1.5x, 2x.</p>
             </div>
             <!-- Feature 3 -->
-            <div class="group glass-light rounded-2xl p-6 card-hover border border-emerald-100">
+            <div class="bg-gray-50 rounded-3xl p-8 hover:shadow-2xl hover:bg-emerald-50 transition-all group" data-aos="fade-up" data-aos-delay="300">
                 <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center text-2xl mb-4 group-hover:scale-110 transition-transform">🤖</div>
                 <h3 class="font-bold text-gray-900 mb-2">IoT NetraDUMP</h3>
                 <p class="text-gray-500 text-sm">Endpoint <code class="text-xs bg-gray-100 px-1 rounded">/api/v1/iot/dump</code> siap menerima data dari robot pengumpul otonom.</p>
             </div>
             <!-- Feature 4 -->
-            <div class="group glass-light rounded-2xl p-6 card-hover border border-emerald-100">
+            <div class="bg-gray-50 rounded-3xl p-8 hover:shadow-2xl hover:bg-emerald-50 transition-all group" data-aos="fade-up" data-aos-delay="400">
                 <div class="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center text-2xl mb-4 group-hover:scale-110 transition-transform">🧠</div>
                 <h3 class="font-bold text-gray-900 mb-2">AI Chatbot Mistral</h3>
                 <p class="text-gray-500 text-sm">Tanya panduan daur ulang atau estimasi poin langsung ke AI. "Berapa poin untuk 2 kg plastik?"</p>
             </div>
         </div>
-    </div>
 </section>
 
 <!-- ===== CARA KERJA ===== -->
@@ -364,7 +364,7 @@
             <div class="flex items-center gap-3">
                 <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-emerald-400 to-green-600 flex items-center justify-center text-white font-bold">♻</div>
                 <div>
-                    <p class="text-white font-bold">Smart Community Waste System</p>
+                    <p class="text-white font-bold">NetraSphere - Smart Waste System by TriNetra</p>
                     <p class="text-gray-500 text-xs">Tugas Besar OOP — Trinetra Team</p>
                 </div>
             </div>
@@ -383,12 +383,12 @@
     <div x-show="open" x-transition class="glass bg-gray-900 rounded-2xl shadow-2xl w-80 mb-4 border border-emerald-800">
         <div class="flex items-center gap-3 p-4 border-b border-gray-700">
             <div class="w-8 h-8 bg-gradient-to-br from-emerald-500 to-green-600 rounded-full flex items-center justify-center text-sm">🧠</div>
-            <div><p class="text-white text-sm font-semibold">SmartWaste AI</p><p class="text-emerald-400 text-xs">Mistral AI • Online</p></div>
+            <div><p class="text-white text-sm font-semibold">NetraSphere AI</p><p class="text-emerald-400 text-xs">Mistral AI • Online</p></div>
             <button @click="open=false" class="ml-auto text-gray-500 hover:text-white">✕</button>
         </div>
         <div class="p-4 h-48 overflow-y-auto space-y-3">
             <div class="bg-emerald-900/50 rounded-xl p-3 text-sm text-emerald-100">
-                👋 Halo! Saya asisten AI SmartWaste. Tanya saja soal daur ulang atau estimasi poin!
+                👋 Halo! Saya asisten AI NetraSphere. Tanya saja soal daur ulang atau estimasi poin!
             </div>
             <template x-for="msg in messages">
                 <div :class="msg.role === 'user' ? 'text-right' : ''">
@@ -407,5 +407,13 @@
     </button>
 </div>
 
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>
+    AOS.init({
+        duration: 800,
+        once: true,
+        offset: 100
+    });
+</script>
 </body>
 </html>

@@ -1,13 +1,10 @@
 package com.smartwaste.dto.request;
 
 import jakarta.validation.constraints.*;
-import lombok.Data;
 
 /**
  * DTO untuk registrasi warga (Citizen) baru.
- * Encapsulation: semua field private, validasi via anotasi Bean Validation.
  */
-@Data
 public class RegisterCitizenRequest {
 
     @NotBlank(message = "Nama tidak boleh kosong")
@@ -32,4 +29,23 @@ public class RegisterCitizenRequest {
     private String address;
     private String rtRw;
     private String kelurahan;
+
+    public RegisterCitizenRequest() {}
+
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
+    public String getPassword() { return password; }
+    public void setPassword(String password) { this.password = password; }
+    public String getPhone() { return phone; }
+    public void setPhone(String phone) { this.phone = phone; }
+    public String getNik() { return nik; }
+    public void setNik(String nik) { this.nik = nik; }
+    public String getAddress() { return address; }
+    public void setAddress(String address) { this.address = address; }
+    public String getRtRw() { return rtRw; }
+    public void setRtRw(String rtRw) { this.rtRw = rtRw; }
+    public String getKelurahan() { return kelurahan; }
+    public void setKelurahan(String kelurahan) { this.kelurahan = kelurahan; }
 }

@@ -18,13 +18,20 @@ import org.springframework.transaction.annotation.Transactional;
  * Implementasi service manajemen warga.
  */
 @Service
-@RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class CitizenServiceImpl implements CitizenService {
 
     private final CitizenRepository citizenRepository;
     private final GreenWalletRepository greenWalletRepository;
     private final WasteDepositRepository wasteDepositRepository;
+
+    public CitizenServiceImpl(CitizenRepository citizenRepository,
+                              GreenWalletRepository greenWalletRepository,
+                              WasteDepositRepository wasteDepositRepository) {
+        this.citizenRepository = citizenRepository;
+        this.greenWalletRepository = greenWalletRepository;
+        this.wasteDepositRepository = wasteDepositRepository;
+    }
 
     @Override
     public CitizenProfileResponse getMyProfile(String citizenEmail) {
@@ -67,6 +74,15 @@ public class CitizenServiceImpl implements CitizenService {
         Citizen citizen = citizenRepository.findById(citizenId)
                 .orElseThrow(() -> new ResourceNotFoundException("Citizen", "id", citizenId));
         citizen.setActive(false);
+        citizenRepository.save(citizen);
+    }
+
+    @Override
+    @Transactional
+    public void toggleCitizenActive(String citizenId) {
+        Citizen citizen = citizenRepository.findById(citizenId)
+                .orElseThrow(() -> new ResourceNotFoundException("Citizen", "id", citizenId));
+        citizen.setActive(!citizen.isActive());
         citizenRepository.save(citizen);
     }
 
@@ -119,7 +135,7 @@ public class CitizenServiceImpl implements CitizenService {
     private CitizenProfileResponse mapToResponse(Citizen citizen) {
         GreenWallet wallet = greenWalletRepository.findByCitizen(citizen).orElse(null);
         double totalWeight = wasteDepositRepository.sumWeightByCitizen(citizen);
-        long totalDeposits = wasteDepositRepository.findByCitizen(citizen, Pageable.unpaged()).getTotalElements();
+        long totalDeposits = wasteDepositRepository.countByCitizenAndStatus(citizen, com.smartwaste.entity.enums.DepositStatus.CONFIRMED);
 
         return CitizenProfileResponse.builder()
                 .id(citizen.getId())

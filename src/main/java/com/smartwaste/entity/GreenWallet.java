@@ -27,10 +27,13 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-@NoArgsConstructor
 @Entity
 @Table(name = "green_wallets")
 public class GreenWallet extends BaseEntity {
+
+    public GreenWallet() {
+        super();
+    }
 
     /**
      * Warga pemilik wallet ini.
@@ -126,4 +129,11 @@ public class GreenWallet extends BaseEntity {
             this.redeemedPoints -= points;
         }
     }
+
+    public Citizen getCitizen() { return citizen; }
+    public void setCitizen(Citizen citizen) { this.citizen = citizen; }
+    public double getTotalPoints() { return totalPoints; }
+    public void setTotalPoints(double totalPoints) { this.totalPoints = totalPoints; }
+    public double getRedeemedPoints() { return redeemedPoints; }
+    public void setRedeemedPoints(double redeemedPoints) { this.redeemedPoints = redeemedPoints; }
 }

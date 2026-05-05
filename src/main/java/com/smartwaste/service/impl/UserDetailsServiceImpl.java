@@ -18,11 +18,16 @@ import org.springframework.stereotype.Service;
  * kita cukup return hasil query dari database tanpa wrapper tambahan.</p>
  */
 @Service
-@RequiredArgsConstructor
 public class UserDetailsServiceImpl implements UserDetailsService {
 
     private final UserRepository userRepository;
     private final com.smartwaste.security.LoginAttemptService loginAttemptService;
+
+    public UserDetailsServiceImpl(UserRepository userRepository,
+                                  com.smartwaste.security.LoginAttemptService loginAttemptService) {
+        this.userRepository = userRepository;
+        this.loginAttemptService = loginAttemptService;
+    }
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {

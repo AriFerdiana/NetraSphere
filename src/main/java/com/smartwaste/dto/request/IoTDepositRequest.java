@@ -1,15 +1,10 @@
 package com.smartwaste.dto.request;
 
 import jakarta.validation.constraints.*;
-import lombok.Data;
 
 /**
- * DTO untuk setoran sampah dari perangkat IoT (smart bin / robot NetraDUMP).
- *
- * <p>Endpoint: POST /api/v1/iot/dump</p>
- * <p>Autentikasi via header X-IoT-Api-Key (bukan JWT).</p>
+ * DTO untuk setoran sampah dari perangkat IoT.
  */
-@Data
 public class IoTDepositRequest {
 
     @NotBlank(message = "Device ID tidak boleh kosong")
@@ -31,4 +26,19 @@ public class IoTDepositRequest {
     /** Raw sensor data (JSON string opsional untuk audit) */
     @Size(max = 2000)
     private String sensorData;
+
+    public IoTDepositRequest() {}
+
+    public String getDeviceId() { return deviceId; }
+    public void setDeviceId(String deviceId) { this.deviceId = deviceId; }
+    public String getCitizenId() { return citizenId; }
+    public void setCitizenId(String citizenId) { this.citizenId = citizenId; }
+    public String getCategoryId() { return categoryId; }
+    public void setCategoryId(String categoryId) { this.categoryId = categoryId; }
+    public Double getWeightKg() { return weightKg; }
+    public void setWeightKg(Double weightKg) { this.weightKg = weightKg; }
+    public String getLocation() { return location; }
+    public void setLocation(String location) { this.location = location; }
+    public String getSensorData() { return sensorData; }
+    public void setSensorData(String sensorData) { this.sensorData = sensorData; }
 }

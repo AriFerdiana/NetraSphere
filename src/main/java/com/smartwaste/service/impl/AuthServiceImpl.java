@@ -26,10 +26,10 @@ import org.springframework.transaction.annotation.Transactional;
  * <p><b>OOP:</b> Implements {@link AuthService} interface. Menggunakan
  * {@code @Transactional} memastikan registrasi citizen + wallet dibuat atomically.</p>
  */
-@Slf4j
 @Service
-@RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
+
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(AuthServiceImpl.class);
 
     private final UserRepository userRepository;
     private final CitizenRepository citizenRepository;
@@ -37,6 +37,20 @@ public class AuthServiceImpl implements AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
     private final AuthenticationManager authenticationManager;
+
+    public AuthServiceImpl(UserRepository userRepository,
+                           CitizenRepository citizenRepository,
+                           GreenWalletRepository greenWalletRepository,
+                           PasswordEncoder passwordEncoder,
+                           JwtUtil jwtUtil,
+                           AuthenticationManager authenticationManager) {
+        this.userRepository = userRepository;
+        this.citizenRepository = citizenRepository;
+        this.greenWalletRepository = greenWalletRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.jwtUtil = jwtUtil;
+        this.authenticationManager = authenticationManager;
+    }
 
     @Override
     @Transactional

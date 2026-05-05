@@ -32,10 +32,14 @@ import java.util.List;
  */
 @Getter
 @Setter
-@NoArgsConstructor
 @Entity
 @Table(name = "waste_categories")
 public class WasteCategory extends BaseEntity {
+
+    public WasteCategory() {
+        super();
+        this.deposits = new ArrayList<>();
+    }
 
     /**
      * Nama kategori sampah yang deskriptif.
@@ -111,4 +115,19 @@ public class WasteCategory extends BaseEntity {
         this.pointsPerKg = pointsPerKg;
         this.iconUrl = iconUrl;
     }
+    // ==================== Manual Getters/Setters ====================
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
+    public WasteType getType() { return type; }
+    public void setType(WasteType type) { this.type = type; }
+    public double getPointsPerKg() { return pointsPerKg; }
+    public void setPointsPerKg(double pointsPerKg) { this.pointsPerKg = pointsPerKg; }
+    public String getIconUrl() { return iconUrl; }
+    public void setIconUrl(String iconUrl) { this.iconUrl = iconUrl; }
+    public boolean isActive() { return active; }
+    public void setActive(boolean active) { this.active = active; }
+    public List<WasteDeposit> getDeposits() { return deposits; }
+    public void setDeposits(List<WasteDeposit> deposits) { this.deposits = deposits; }
 }

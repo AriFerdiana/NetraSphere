@@ -16,12 +16,13 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/wallet")
-@RequiredArgsConstructor
-@Tag(name = "Green Wallet", description = "Manajemen poin dan penukaran reward")
-@SecurityRequirement(name = "bearerAuth")
 public class GreenWalletController {
 
     private final GreenWalletService walletService;
+
+    public GreenWalletController(GreenWalletService walletService) {
+        this.walletService = walletService;
+    }
 
     @GetMapping("/my")
     @PreAuthorize("hasRole('CITIZEN')")

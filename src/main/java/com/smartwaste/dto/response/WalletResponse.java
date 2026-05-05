@@ -1,13 +1,8 @@
 package com.smartwaste.dto.response;
 
-import lombok.Builder;
-import lombok.Data;
-
 /**
  * DTO response Green Wallet — saldo poin warga.
  */
-@Data
-@Builder
 public class WalletResponse {
 
     private String walletId;
@@ -16,6 +11,36 @@ public class WalletResponse {
     private double totalPoints;
     private double redeemedPoints;
     private double availablePoints;
+
+    public WalletResponse() {}
+
+    public static WalletResponseBuilder builder() {
+        return new WalletResponseBuilder();
+    }
+
+    public static class WalletResponseBuilder {
+        private WalletResponse r = new WalletResponse();
+        public WalletResponseBuilder walletId(String id) { r.walletId = id; return this; }
+        public WalletResponseBuilder citizenId(String id) { r.citizenId = id; return this; }
+        public WalletResponseBuilder citizenName(String name) { r.citizenName = name; return this; }
+        public WalletResponseBuilder totalPoints(double p) { r.totalPoints = p; return this; }
+        public WalletResponseBuilder redeemedPoints(double p) { r.redeemedPoints = p; return this; }
+        public WalletResponseBuilder availablePoints(double p) { r.availablePoints = p; return this; }
+        public WalletResponse build() { return r; }
+    }
+
+    public String getWalletId() { return walletId; }
+    public void setWalletId(String walletId) { this.walletId = walletId; }
+    public String getCitizenId() { return citizenId; }
+    public void setCitizenId(String citizenId) { this.citizenId = citizenId; }
+    public String getCitizenName() { return citizenName; }
+    public void setCitizenName(String citizenName) { this.citizenName = citizenName; }
+    public double getTotalPoints() { return totalPoints; }
+    public void setTotalPoints(double totalPoints) { this.totalPoints = totalPoints; }
+    public double getRedeemedPoints() { return redeemedPoints; }
+    public void setRedeemedPoints(double redeemedPoints) { this.redeemedPoints = redeemedPoints; }
+    public double getAvailablePoints() { return availablePoints; }
+    public void setAvailablePoints(double availablePoints) { this.availablePoints = availablePoints; }
 
     /** Level gamifikasi berdasarkan total poin */
     public String getLevel() {

@@ -24,12 +24,13 @@ import org.springframework.web.bind.annotation.*;
  */
 @RestController
 @RequestMapping("/api/v1/deposits")
-@RequiredArgsConstructor
-@Tag(name = "Waste Deposits", description = "Manajemen setoran sampah")
-@SecurityRequirement(name = "bearerAuth")
 public class WasteDepositController {
 
     private final WasteDepositService depositService;
+
+    public WasteDepositController(WasteDepositService depositService) {
+        this.depositService = depositService;
+    }
 
     /** Citizen membuat setoran sampah baru */
     @PostMapping
@@ -79,13 +80,14 @@ public class WasteDepositController {
                 depositService.getPendingDeposits(PageRequest.of(page, size))));
     }
 
-    /** Collector mengkonfirmasi setoran — poin dikreditkan ke wallet */
     @PostMapping("/{id}/confirm")
     @PreAuthorize("hasAnyRole('COLLECTOR', 'ADMIN')")
     @Operation(summary = "Konfirmasi setoran", description = "Poin otomatis dihitung dan dikreditkan ke Green Wallet warga")
     public ResponseEntity<ApiResponse<WasteDepositResponse>> confirmDeposit(
-            @PathVariable String id, Authentication auth) {
-        WasteDepositResponse response = depositService.confirmDeposit(id, auth.getName());
+            @PathVariable String id, 
+            @RequestParam(required = false) String pickupProofUrl,
+            Authentication auth) {
+        WasteDepositResponse response = depositService.confirmDeposit(id, auth.getName(), pickupProofUrl != null ? pickupProofUrl : "");
         return ResponseEntity.ok(ApiResponse.success(
                 String.format("Setoran dikonfirmasi! %.0f poin dikreditkan ke Green Wallet.", response.getPointsEarned()),
                 response));

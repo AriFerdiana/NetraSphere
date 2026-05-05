@@ -17,14 +17,24 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Service
-@RequiredArgsConstructor
-@Slf4j
 public class PasswordResetService {
+
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(PasswordResetService.class);
 
     private final UserRepository userRepository;
     private final PasswordResetTokenRepository tokenRepository;
     private final PasswordEncoder passwordEncoder;
     private final JavaMailSender mailSender;
+
+    public PasswordResetService(UserRepository userRepository,
+                                PasswordResetTokenRepository tokenRepository,
+                                PasswordEncoder passwordEncoder,
+                                JavaMailSender mailSender) {
+        this.userRepository = userRepository;
+        this.tokenRepository = tokenRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.mailSender = mailSender;
+    }
 
     @Transactional
     public void createPasswordResetTokenForUser(String email) {

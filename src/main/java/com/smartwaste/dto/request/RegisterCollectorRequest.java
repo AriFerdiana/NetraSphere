@@ -1,12 +1,10 @@
 package com.smartwaste.dto.request;
 
 import jakarta.validation.constraints.*;
-import lombok.Data;
 
 /**
- * DTO untuk registrasi Collector baru oleh Admin.
+ * DTO untuk registrasi Collector baru.
  */
-@Data
 public class RegisterCollectorRequest {
 
     @NotBlank(message = "Nama tidak boleh kosong")
@@ -28,4 +26,19 @@ public class RegisterCollectorRequest {
 
     @Size(max = 200)
     private String assignedArea;
+
+    public RegisterCollectorRequest() {}
+
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
+    public String getPassword() { return password; }
+    public void setPassword(String password) { this.password = password; }
+    public String getPhone() { return phone; }
+    public void setPhone(String phone) { this.phone = phone; }
+    public String getVehicleNumber() { return vehicleNumber; }
+    public void setVehicleNumber(String vehicleNumber) { this.vehicleNumber = vehicleNumber; }
+    public String getAssignedArea() { return assignedArea; }
+    public void setAssignedArea(String assignedArea) { this.assignedArea = assignedArea; }
 }

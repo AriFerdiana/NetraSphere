@@ -20,11 +20,13 @@ import org.springframework.web.bind.annotation.*;
  */
 @RestController
 @RequestMapping("/api/v1/auth")
-@RequiredArgsConstructor
-@Tag(name = "Authentication", description = "Register dan Login untuk semua role")
 public class AuthController {
 
     private final AuthService authService;
+
+    public AuthController(AuthService authService) {
+        this.authService = authService;
+    }
 
     /**
      * Mendaftarkan Citizen baru beserta GreenWallet-nya.

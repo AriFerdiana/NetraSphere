@@ -14,10 +14,13 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
  * Menggunakan @Controller (bukan @RestController) untuk mengembalikan nama view Thymeleaf.
  */
 @Controller
-@RequiredArgsConstructor
 public class WebController {
 
     private final PasswordResetService passwordResetService;
+
+    public WebController(PasswordResetService passwordResetService) {
+        this.passwordResetService = passwordResetService;
+    }
 
     @GetMapping("/")
     public String index(Model model) {

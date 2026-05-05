@@ -10,6 +10,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -26,7 +27,7 @@ import java.util.Map;
  * terpusat (Single Responsibility Principle) — semua error handling dikumpulkan di satu
  * tempat dan tidak tersebar di setiap controller.</p>
  */
-@RestControllerAdvice
+@org.springframework.web.bind.annotation.ControllerAdvice
 public class GlobalExceptionHandler {
 
     // ==================== Error Response Builder ====================
@@ -110,11 +111,16 @@ public class GlobalExceptionHandler {
 
     /**
      * Menangani kredensial login yang salah (401 Unauthorized).
+     * Hanya untuk REST API — Spring Security menangani form-login web secara native.
      */
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<Map<String, Object>> handleBadCredentialsException(
-            BadCredentialsException ex, WebRequest request) {
+            BadCredentialsException ex, WebRequest request, HttpServletRequest httpRequest) throws BadCredentialsException {
 
+        // Biarkan Spring Security menangani request web (form login) secara native
+        if (!isApiRequest(httpRequest)) {
+            throw ex;
+        }
         return buildErrorResponse(
                 HttpStatus.UNAUTHORIZED,
                 "Email atau password salah. Silakan coba lagi.",
@@ -125,17 +131,31 @@ public class GlobalExceptionHandler {
 
     /**
      * Menangani akses ditolak oleh Spring Security (403 Forbidden).
+     * Untuk request API: kembalikan JSON 403.
+     * Untuk request web: re-throw agar Spring Security redirect ke /auth/access-denied.
      */
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<Map<String, Object>> handleAccessDeniedException(
-            AccessDeniedException ex, WebRequest request) {
+            AccessDeniedException ex, WebRequest request, HttpServletRequest httpRequest) throws AccessDeniedException {
 
+        // Re-throw untuk web request — biarkan SecurityConfig.accessDeniedPage() bekerja
+        if (!isApiRequest(httpRequest)) {
+            throw ex;
+        }
         return buildErrorResponse(
                 HttpStatus.FORBIDDEN,
                 "Akses ditolak. Role Anda tidak memiliki izin untuk operasi ini.",
                 null,
                 request
         );
+    }
+
+    /**
+     * Helper: apakah request ini berasal dari REST API (/api/**)?
+     */
+    private boolean isApiRequest(HttpServletRequest request) {
+        String uri = request.getRequestURI();
+        return uri != null && uri.startsWith("/api/");
     }
 
     // ==================== Validation Exceptions ====================
@@ -191,8 +211,17 @@ public class GlobalExceptionHandler {
      * Mengembalikan 500 Internal Server Error dengan pesan generik (tidak bocorkan stack trace).
      */
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<Map<String, Object>> handleGenericException(
-            Exception ex, WebRequest request) {
+    public Object handleGenericException(
+            Exception ex, WebRequest request, HttpServletRequest httpRequest) throws Exception {
+
+        // Log detail error ke console agar developer bisa debug (penting karena kita sembunyikan dari client)
+        System.err.println("CRITICAL ERROR: " + ex.getMessage());
+        ex.printStackTrace();
+
+        // Jika bukan request API, biarkan Spring menangani secara native (redirect ke /error)
+        if (!isApiRequest(httpRequest)) {
+            throw ex;
+        }
 
         return buildErrorResponse(
                 HttpStatus.INTERNAL_SERVER_ERROR,

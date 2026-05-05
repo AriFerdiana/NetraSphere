@@ -13,11 +13,14 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Service
-@RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class WasteCategoryServiceImpl implements WasteCategoryService {
 
     private final WasteCategoryRepository categoryRepository;
+
+    public WasteCategoryServiceImpl(WasteCategoryRepository categoryRepository) {
+        this.categoryRepository = categoryRepository;
+    }
 
     @Override
     public List<WasteCategoryResponse> getAllActive() {

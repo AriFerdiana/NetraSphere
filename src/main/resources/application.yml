@@ -4,7 +4,7 @@ spring:
 
   # ===== DATABASE CONFIGURATION =====
   datasource:
-    url: jdbc:mysql://localhost:3306/db_tubes_pbo_trinetra?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=Asia/Jakarta&allowPublicKeyRetrieval=true&characterEncoding=UTF-8
+    url: jdbc:mysql://localhost:3306/db_tubes_pbo_trinetra?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=Asia/Jakarta&allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=UTF-8
     username: root
     password:
     driver-class-name: com.mysql.cj.jdbc.Driver
