@@ -21,6 +21,7 @@ USE `db_tubes_pbo_trinetra`;
 
 
 -- Dumping structure for table db_tubes_pbo_trinetra.users
+DROP TABLE IF EXISTS users;
 CREATE TABLE IF NOT EXISTS `users` (
   `user_type` varchar(31) NOT NULL,
   `id` varchar(36) NOT NULL,
@@ -102,6 +103,7 @@ INSERT INTO `users` (`user_type`, `id`, `created_at`, `updated_at`, `active`, `e
 	('CITIZEN', 'f9404ec0-2243-435e-a8eb-04f2902794e3', '2026-04-26 15:25:52.942385', '2026-04-26 15:25:52.942385', b'1', 'warga44@smartwaste.com', 'Ratna Sihombing', '$2a$12$X3j6FFEAWkroCvKiV5yTl.PGDFtT0dAodJbtXKadUrg.xV2ZjMsxq', '081290184595'),
 	('CITIZEN', 'fa469c10-ad7f-404b-b96d-986f0b650e1b', '2026-04-26 15:25:33.763382', '2026-04-26 15:25:33.763382', b'1', 'warga22@smartwaste.com', 'Joko Santoso', '$2a$12$X7WVpA5yZWb91fMabsag4.gNCOqpXluSSnF1Gjw8cNktWAhaBgO4i', '081250087670');
 -- Dumping structure for table db_tubes_pbo_trinetra.admins
+DROP TABLE IF EXISTS admins;
 CREATE TABLE IF NOT EXISTS `admins` (
   `position` varchar(100) DEFAULT NULL,
   `user_id` varchar(36) NOT NULL,
@@ -114,6 +116,7 @@ INSERT INTO `admins` (`position`, `user_id`) VALUES
 	('Super Administrator', '20d4665a-19dc-4c6b-9d6a-822422ed3af2');
 
 -- Dumping structure for table db_tubes_pbo_trinetra.chat_logs
+DROP TABLE IF EXISTS chat_logs;
 CREATE TABLE IF NOT EXISTS `chat_logs` (
   `id` varchar(36) NOT NULL,
   `created_at` datetime(6) NOT NULL,
@@ -134,6 +137,7 @@ CREATE TABLE IF NOT EXISTS `chat_logs` (
 -- Dumping data for table db_tubes_pbo_trinetra.chat_logs: ~0 rows (approximately)
 
 -- Dumping structure for table db_tubes_pbo_trinetra.chat_messages
+DROP TABLE IF EXISTS chat_messages;
 CREATE TABLE IF NOT EXISTS `chat_messages` (
   `id` varchar(255) NOT NULL,
   `is_read` bit(1) NOT NULL,
@@ -158,6 +162,7 @@ INSERT INTO `chat_messages` (`id`, `is_read`, `message`, `sent_at`, `receiver_id
 	('c0c5d0ee-1cb9-4718-94cb-65e2e4bb7a40', b'1', 'xzxzxzxz', '2026-04-26 23:49:24.165093', '245b8746-cf46-4a94-9148-58dd0315f2b5', '0da6dd2b-486c-4e0e-a99e-83d7a36d155f');
 
 -- Dumping structure for table db_tubes_pbo_trinetra.citizens
+DROP TABLE IF EXISTS citizens;
 CREATE TABLE IF NOT EXISTS `citizens` (
   `address` text,
   `kelurahan` varchar(100) DEFAULT NULL,
@@ -224,6 +229,7 @@ INSERT INTO `citizens` (`address`, `kelurahan`, `nik`, `rt_rw`, `user_id`) VALUE
 	('Jl. Dummy No. 22', 'Sukabersih', '3201100306543642', '09/02', 'fa469c10-ad7f-404b-b96d-986f0b650e1b');
 
 -- Dumping structure for table db_tubes_pbo_trinetra.collectors
+DROP TABLE IF EXISTS collectors;
 CREATE TABLE IF NOT EXISTS `collectors` (
   `assigned_area` varchar(200) DEFAULT NULL,
   `available` bit(1) NOT NULL,
@@ -254,6 +260,7 @@ INSERT INTO `collectors` (`assigned_area`, `available`, `is_iot_device`, `iot_de
 	('Area Wilayah A', b'1', b'0', NULL, 'B 1234 SW', 'e2037d74-845a-40bf-868b-a0807f1a08e4', 145.69999999999996, 500);
 
 -- Dumping structure for table db_tubes_pbo_trinetra.collector_notifications
+DROP TABLE IF EXISTS collector_notifications;
 CREATE TABLE IF NOT EXISTS `collector_notifications` (
   `id` varchar(36) NOT NULL,
   `created_at` datetime(6) NOT NULL,
@@ -270,6 +277,7 @@ CREATE TABLE IF NOT EXISTS `collector_notifications` (
 -- Dumping data for table db_tubes_pbo_trinetra.collector_notifications: ~0 rows (approximately)
 
 -- Dumping structure for table db_tubes_pbo_trinetra.green_wallets
+DROP TABLE IF EXISTS green_wallets;
 CREATE TABLE IF NOT EXISTS `green_wallets` (
   `id` varchar(36) NOT NULL,
   `created_at` datetime(6) NOT NULL,
@@ -337,6 +345,7 @@ INSERT INTO `green_wallets` (`id`, `created_at`, `updated_at`, `redeemed_points`
 	('e9431380-ff0c-4d93-a2f1-79e6a96e1bd6', '2026-04-26 15:25:15.672272', '2026-04-26 21:51:25.736772', 0, 1629, 'da724c70-e971-422f-97eb-10c281e35326');
 
 -- Dumping structure for table db_tubes_pbo_trinetra.password_reset_tokens
+DROP TABLE IF EXISTS password_reset_tokens;
 CREATE TABLE IF NOT EXISTS `password_reset_tokens` (
   `id` bigint NOT NULL AUTO_INCREMENT,
   `expiry_date` datetime(6) NOT NULL,
@@ -351,6 +360,7 @@ CREATE TABLE IF NOT EXISTS `password_reset_tokens` (
 -- Dumping data for table db_tubes_pbo_trinetra.password_reset_tokens: ~0 rows (approximately)
 
 -- Dumping structure for table db_tubes_pbo_trinetra.point_redemptions
+DROP TABLE IF EXISTS point_redemptions;
 CREATE TABLE IF NOT EXISTS `point_redemptions` (
   `id` varchar(36) NOT NULL,
   `created_at` datetime(6) NOT NULL,
@@ -376,6 +386,7 @@ INSERT INTO `point_redemptions` (`id`, `created_at`, `updated_at`, `admin_notes`
 
 
 -- Dumping structure for table db_tubes_pbo_trinetra.waste_categories
+DROP TABLE IF EXISTS waste_categories;
 CREATE TABLE IF NOT EXISTS `waste_categories` (
   `id` varchar(36) NOT NULL,
   `created_at` datetime(6) NOT NULL,
@@ -400,6 +411,7 @@ INSERT INTO `waste_categories` (`id`, `created_at`, `updated_at`, `active`, `des
 	('ed7cc969-180c-44d8-9a27-89f1d3743699', '2026-04-12 21:31:28.865670', '2026-04-12 21:31:28.865670', b'1', 'Sampah organik dari sisa makanan, sayuran, dan buah-buahan', '🍎', 'Sisa Makanan & Dapur', 5, 'ORGANIC');
 
 -- Dumping structure for table db_tubes_pbo_trinetra.waste_deposits
+DROP TABLE IF EXISTS waste_deposits;
 CREATE TABLE IF NOT EXISTS `waste_deposits` (
   `id` varchar(36) NOT NULL,
   `created_at` datetime(6) NOT NULL,
