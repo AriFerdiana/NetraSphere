@@ -1,4 +1,4 @@
-﻿-- --------------------------------------------------------
+-- --------------------------------------------------------
 -- Host:                         127.0.0.1
 -- Server version:               8.0.45 - MySQL Community Server - GPL
 -- Server OS:                    Win64
@@ -16,7 +16,7 @@
 
 
 -- Dumping database structure for db_tubes_pbo_trinetra
-CREATE DATABASE IF NOT EXISTS `db_tubes_pbo_trinetra` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
+CREATE DATABASE IF NOT EXISTS `db_tubes_pbo_trinetra` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
 USE `db_tubes_pbo_trinetra`;
 
 
@@ -33,7 +33,7 @@ CREATE TABLE IF NOT EXISTS `users` (
   `phone` varchar(20) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `UK_6dotkott2kjsp8vw4d0m25fb7` (`email`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Dumping data for table db_tubes_pbo_trinetra.users: ~64 rows (approximately)
 INSERT INTO `users` (`user_type`, `id`, `created_at`, `updated_at`, `active`, `email`, `name`, `password`, `phone`) VALUES
@@ -107,7 +107,7 @@ CREATE TABLE IF NOT EXISTS `admins` (
   `user_id` varchar(36) NOT NULL,
   PRIMARY KEY (`user_id`),
   CONSTRAINT `FKgc8dtql9mkq268detxiox7fpm` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Dumping data for table db_tubes_pbo_trinetra.admins: ~1 rows (approximately)
 INSERT INTO `admins` (`position`, `user_id`) VALUES
@@ -129,7 +129,7 @@ CREATE TABLE IF NOT EXISTS `chat_logs` (
   KEY `idx_chatlog_citizen` (`citizen_id`),
   KEY `idx_chatlog_session` (`session_id`),
   CONSTRAINT `FKtgal3v8m3x8ei8gx35a63jxsj` FOREIGN KEY (`citizen_id`) REFERENCES `citizens` (`user_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Dumping data for table db_tubes_pbo_trinetra.chat_logs: ~0 rows (approximately)
 
@@ -146,7 +146,7 @@ CREATE TABLE IF NOT EXISTS `chat_messages` (
   KEY `FKgiqeap8ays4lf684x7m0r2729` (`sender_id`),
   CONSTRAINT `FKand7mh9iu4kt3n1tn2w9i9of0` FOREIGN KEY (`receiver_id`) REFERENCES `users` (`id`),
   CONSTRAINT `FKgiqeap8ays4lf684x7m0r2729` FOREIGN KEY (`sender_id`) REFERENCES `users` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Dumping data for table db_tubes_pbo_trinetra.chat_messages: ~6 rows (approximately)
 INSERT INTO `chat_messages` (`id`, `is_read`, `message`, `sent_at`, `receiver_id`, `sender_id`) VALUES
@@ -167,7 +167,7 @@ CREATE TABLE IF NOT EXISTS `citizens` (
   PRIMARY KEY (`user_id`),
   UNIQUE KEY `UK_r0yt63hv6msudilci5kjt4ibw` (`nik`),
   CONSTRAINT `FKgx7s2yqk5jxh5dmc03swk30em` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Dumping data for table db_tubes_pbo_trinetra.citizens: ~51 rows (approximately)
 INSERT INTO `citizens` (`address`, `kelurahan`, `nik`, `rt_rw`, `user_id`) VALUES
@@ -236,7 +236,7 @@ CREATE TABLE IF NOT EXISTS `collectors` (
   PRIMARY KEY (`user_id`),
   UNIQUE KEY `UK_o8uhe98exkw49gwrikjawpn4w` (`iot_device_id`),
   CONSTRAINT `FK6m9ylxjcfj1o0hgf5o4udcj3o` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Dumping data for table db_tubes_pbo_trinetra.collectors: ~12 rows (approximately)
 INSERT INTO `collectors` (`assigned_area`, `available`, `is_iot_device`, `iot_device_id`, `vehicle_number`, `user_id`, `current_load_kg`, `max_capacity_kg`) VALUES
@@ -265,7 +265,7 @@ CREATE TABLE IF NOT EXISTS `collector_notifications` (
   PRIMARY KEY (`id`),
   KEY `FK147252bx2f418se0c2hmohxqo` (`collector_id`),
   CONSTRAINT `FK147252bx2f418se0c2hmohxqo` FOREIGN KEY (`collector_id`) REFERENCES `collectors` (`user_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Dumping data for table db_tubes_pbo_trinetra.collector_notifications: ~0 rows (approximately)
 
@@ -280,7 +280,7 @@ CREATE TABLE IF NOT EXISTS `green_wallets` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `UK_iv38bt9mjks8qux51i4o457x7` (`citizen_id`),
   CONSTRAINT `FK1jtobabq932ruksxppbb29g71` FOREIGN KEY (`citizen_id`) REFERENCES `citizens` (`user_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Dumping data for table db_tubes_pbo_trinetra.green_wallets: ~51 rows (approximately)
 INSERT INTO `green_wallets` (`id`, `created_at`, `updated_at`, `redeemed_points`, `total_points`, `citizen_id`) VALUES
@@ -346,7 +346,7 @@ CREATE TABLE IF NOT EXISTS `password_reset_tokens` (
   UNIQUE KEY `UK_71lqwbwtklmljk3qlsugr1mig` (`token`),
   UNIQUE KEY `UK_la2ts67g4oh2sreayswhox1i6` (`user_id`),
   CONSTRAINT `FKk3ndxg5xp6v7wd4gjyusp15gq` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Dumping data for table db_tubes_pbo_trinetra.password_reset_tokens: ~0 rows (approximately)
 
@@ -365,7 +365,7 @@ CREATE TABLE IF NOT EXISTS `point_redemptions` (
   KEY `idx_redemption_citizen` (`citizen_id`),
   KEY `idx_redemption_status` (`status`),
   CONSTRAINT `FKehchtngar3nw5cb63d5vvojub` FOREIGN KEY (`citizen_id`) REFERENCES `citizens` (`user_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Dumping data for table db_tubes_pbo_trinetra.point_redemptions: ~1 rows (approximately)
 INSERT INTO `point_redemptions` (`id`, `created_at`, `updated_at`, `admin_notes`, `description`, `points_redeemed`, `reward_code`, `status`, `citizen_id`) VALUES
@@ -387,17 +387,17 @@ CREATE TABLE IF NOT EXISTS `waste_categories` (
   `points_per_kg` double NOT NULL,
   `type` enum('ORGANIC','INORGANIC','B3') NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Dumping data for table db_tubes_pbo_trinetra.waste_categories: ~7 rows (approximately)
 INSERT INTO `waste_categories` (`id`, `created_at`, `updated_at`, `active`, `description`, `icon_url`, `name`, `points_per_kg`, `type`) VALUES
-	('032cc629-1ced-441c-9d92-418638f7ea0f', '2026-04-12 21:31:28.928126', '2026-04-12 21:31:28.928126', b'1', 'Kertas bekas, koran, majalah, kardus bersih yang dapat didaur ulang', 'ðŸ“¦', 'Kertas & Kardus', 8, 'INORGANIC'),
-	('22246f99-6f62-486c-bdeb-a43fd960b624', '2026-04-12 21:31:28.942473', '2026-04-12 21:31:28.942473', b'1', 'Kaleng minuman, kaleng makanan dari aluminium atau baja', 'ðŸ¥«', 'Kaleng Logam', 15, 'INORGANIC'),
-	('446cb7af-2f2f-4289-9c8c-d174b82ce4dd', '2026-04-12 21:31:28.890555', '2026-04-12 21:31:28.890555', b'1', 'Sampah organik dari kebun seperti daun kering dan ranting kecil', 'ðŸƒ', 'Daun & Ranting', 3, 'ORGANIC'),
-	('504d5b87-5675-4ce0-9bda-b8f305ebec10', '2026-04-12 21:31:28.913797', '2026-04-12 21:31:28.913797', b'1', 'Botol minuman plastik jenis PET yang dapat didaur ulang', 'â™»ï¸', 'Botol Plastik (PET)', 12, 'INORGANIC'),
-	('8efe8add-58ba-4181-8a5b-4c25e8cdef30', '2026-04-12 21:31:28.959472', '2026-04-12 21:31:28.959472', b'1', 'Baterai AA, AAA, baterai tombol, atau baterai lithium bekas â€” limbah B3', 'ðŸ”‹', 'Baterai Bekas', 30, 'B3'),
-	('9e95c899-0fd6-4dc0-88c3-aa1cfeefeee8', '2026-04-12 21:31:28.992487', '2026-04-12 21:31:28.992487', b'1', 'Handphone rusak, charger bekas, PCB, lampu LED/neon â€” limbah B3 elektronik', 'ðŸ’»', 'Elektronik & E-Waste', 50, 'B3'),
-	('ed7cc969-180c-44d8-9a27-89f1d3743699', '2026-04-12 21:31:28.865670', '2026-04-12 21:31:28.865670', b'1', 'Sampah organik dari sisa makanan, sayuran, dan buah-buahan', 'ðŸŽ', 'Sisa Makanan & Dapur', 5, 'ORGANIC');
+	('032cc629-1ced-441c-9d92-418638f7ea0f', '2026-04-12 21:31:28.928126', '2026-04-12 21:31:28.928126', b'1', 'Kertas bekas, koran, majalah, kardus bersih yang dapat didaur ulang', '📦', 'Kertas & Kardus', 8, 'INORGANIC'),
+	('22246f99-6f62-486c-bdeb-a43fd960b624', '2026-04-12 21:31:28.942473', '2026-04-12 21:31:28.942473', b'1', 'Kaleng minuman, kaleng makanan dari aluminium atau baja', '🥫', 'Kaleng Logam', 15, 'INORGANIC'),
+	('446cb7af-2f2f-4289-9c8c-d174b82ce4dd', '2026-04-12 21:31:28.890555', '2026-04-12 21:31:28.890555', b'1', 'Sampah organik dari kebun seperti daun kering dan ranting kecil', '🍃', 'Daun & Ranting', 3, 'ORGANIC'),
+	('504d5b87-5675-4ce0-9bda-b8f305ebec10', '2026-04-12 21:31:28.913797', '2026-04-12 21:31:28.913797', b'1', 'Botol minuman plastik jenis PET yang dapat didaur ulang', '♻️', 'Botol Plastik (PET)', 12, 'INORGANIC'),
+	('8efe8add-58ba-4181-8a5b-4c25e8cdef30', '2026-04-12 21:31:28.959472', '2026-04-12 21:31:28.959472', b'1', 'Baterai AA, AAA, baterai tombol, atau baterai lithium bekas — limbah B3', '🔋', 'Baterai Bekas', 30, 'B3'),
+	('9e95c899-0fd6-4dc0-88c3-aa1cfeefeee8', '2026-04-12 21:31:28.992487', '2026-04-12 21:31:28.992487', b'1', 'Handphone rusak, charger bekas, PCB, lampu LED/neon — limbah B3 elektronik', '💻', 'Elektronik & E-Waste', 50, 'B3'),
+	('ed7cc969-180c-44d8-9a27-89f1d3743699', '2026-04-12 21:31:28.865670', '2026-04-12 21:31:28.865670', b'1', 'Sampah organik dari sisa makanan, sayuran, dan buah-buahan', '🍎', 'Sisa Makanan & Dapur', 5, 'ORGANIC');
 
 -- Dumping structure for table db_tubes_pbo_trinetra.waste_deposits
 CREATE TABLE IF NOT EXISTS `waste_deposits` (
@@ -427,7 +427,7 @@ CREATE TABLE IF NOT EXISTS `waste_deposits` (
   CONSTRAINT `FK7ttw8blddgf7ifnn1b879c964` FOREIGN KEY (`category_id`) REFERENCES `waste_categories` (`id`),
   CONSTRAINT `FKaomv4rm5jtsx733yn1wi2tr4k` FOREIGN KEY (`citizen_id`) REFERENCES `citizens` (`user_id`),
   CONSTRAINT `FKofw1j35wn4lxt591ee1ep9u8c` FOREIGN KEY (`collector_id`) REFERENCES `collectors` (`user_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Dumping data for table db_tubes_pbo_trinetra.waste_deposits: ~167 rows (approximately)
 INSERT INTO `waste_deposits` (`id`, `created_at`, `updated_at`, `confirmed_at`, `from_iot`, `image_url`, `iot_device_id`, `location`, `notes`, `points_earned`, `status`, `weight_kg`, `category_id`, `citizen_id`, `collector_id`, `pickup_proof_url`) VALUES
