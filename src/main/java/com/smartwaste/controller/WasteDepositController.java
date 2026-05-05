@@ -65,7 +65,7 @@ public class WasteDepositController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
         Page<WasteDepositResponse> deposits = depositService.getAllDeposits(
-                null, null, PageRequest.of(page, size, Sort.by("createdAt").descending()));
+                null, null, null, PageRequest.of(page, size, Sort.by("createdAt").descending()));
         return ResponseEntity.ok(ApiResponse.success("Data berhasil diambil.", deposits));
     }
 
