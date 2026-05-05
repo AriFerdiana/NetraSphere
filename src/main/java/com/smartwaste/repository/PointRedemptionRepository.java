@@ -16,7 +16,11 @@ public interface PointRedemptionRepository extends JpaRepository<PointRedemption
 
     Page<PointRedemption> findByCitizen(Citizen citizen, Pageable pageable);
 
-    Page<PointRedemption> findByStatus(RedemptionStatus status, Pageable pageable);
+    @org.springframework.data.jpa.repository.EntityGraph(attributePaths = {"citizen"})
+    Page<PointRedemption> findByStatus(com.smartwaste.entity.enums.RedemptionStatus status, org.springframework.data.domain.Pageable pageable);
+
+    @org.springframework.data.jpa.repository.EntityGraph(attributePaths = {"citizen"})
+    Page<PointRedemption> findAll(org.springframework.data.domain.Pageable pageable);
 
     long countByStatus(RedemptionStatus status);
 

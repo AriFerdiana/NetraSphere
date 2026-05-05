@@ -18,6 +18,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Controller untuk halaman-halaman Admin.
@@ -64,6 +65,7 @@ public class AdminWebController {
     // ==================== DASHBOARD UTAMA ====================
 
     @GetMapping("/dashboard")
+    @Transactional(readOnly = true)
     public String dashboard(Model model,
                             @RequestParam(defaultValue = "0") int page,
                             @RequestParam(defaultValue = "") String search,

@@ -19,7 +19,7 @@ spring:
     hibernate:
       ddl-auto: update          # Otomatis update schema (gunakan 'validate' di production)
     show-sql: true
-    open-in-view: false         # Disable OSIV untuk performa lebih baik
+    open-in-view: true          # Enable OSIV for Thymeleaf rendering
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQL8Dialect

@@ -44,30 +44,30 @@
     <!-- Navigation -->
     <nav class="p-4 flex-1 space-y-1">
         <p class="text-emerald-600 text-xs font-bold uppercase tracking-widest px-3 mb-3">Menu Utama</p>
-        <div class="nav-link active" @click="activeTab='overview'">
+        <div class="nav-link" :class="activeTab==='overview' ? 'active' : ''" @click="activeTab='overview'">
             <span class="text-lg">📊</span> Ringkasan
         </div>
-        <div class="nav-link" @click="activeTab='citizens'">
+        <div class="nav-link" :class="activeTab==='citizens' ? 'active' : ''" @click="activeTab='citizens'">
             <span class="text-lg">👥</span> Manajemen Warga
             <span class="ml-auto bg-emerald-500 text-white text-xs px-2 py-0.5 rounded-full"
                   th:text="${report.totalCitizens}">0</span>
         </div>
-        <div class="nav-link" @click="activeTab='deposits'">
+        <div class="nav-link" :class="activeTab==='deposits' ? 'active' : ''" @click="activeTab='deposits'">
             <span class="text-lg">🗑️</span> Setoran Sampah
             <span th:if="${report.pendingDeposits > 0}"
                   class="ml-auto bg-amber-500 text-white text-xs px-2 py-0.5 rounded-full"
                   th:text="${report.pendingDeposits} + ' pending'">0</span>
         </div>
-        <div class="nav-link" @click="activeTab='categories'">
+        <div class="nav-link" :class="activeTab==='categories' ? 'active' : ''" @click="activeTab='categories'">
             <span class="text-lg">🏷️</span> Kategori
         </div>
-        <div class="nav-link" @click="activeTab='collectors'">
+        <div class="nav-link" :class="activeTab==='collectors' ? 'active' : ''" @click="activeTab='collectors'">
             <span class="text-lg">🚚</span> Petugas
         </div>
-        <div class="nav-link" @click="activeTab='redemptions'">
+        <div class="nav-link" :class="activeTab==='redemptions' ? 'active' : ''" @click="activeTab='redemptions'">
             <span class="text-lg">🎁</span> Penukaran Poin
         </div>
-        <div class="nav-link" @click="activeTab='reports'">
+        <div class="nav-link" :class="activeTab==='reports' ? 'active' : ''" @click="activeTab='reports'">
             <span class="text-lg">📈</span> Laporan & Grafik
         </div>
  
@@ -111,7 +111,7 @@
                     </div>
                 </button>
                 
-                <div x-show="open" @click.away="open = false" x-transition:enter="transition ease-out duration-100" x-transition:enter-start="transform opacity-0 scale-95" x-transition:enter-end="transform opacity-100 scale-100" class="absolute right-0 mt-2 w-56 bg-white rounded-[2rem] shadow-2xl border border-gray-100 py-3 z-50 overflow-hidden">
+                <div x-show="open" style="display:none;" @click.away="open = false" x-transition:enter="transition ease-out duration-100" x-transition:enter-start="transform opacity-0 scale-95" x-transition:enter-end="transform opacity-100 scale-100" class="absolute right-0 mt-2 w-56 bg-white rounded-[2rem] shadow-2xl border border-gray-100 py-3 z-50 overflow-hidden">
                     <div class="px-6 py-3 border-b border-gray-50 mb-2 bg-emerald-50/30">
                         <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Akun Saya</p>
                         <p class="text-sm font-bold text-gray-900 truncate" sec:authentication="name">admin@smartwaste.com</p>
@@ -244,7 +244,7 @@
                                 </td>
                                 <td class="py-3 text-gray-700 text-sm" th:text="${#numbers.formatDecimal(d.weightKg,1,1)} + ' kg'">0</td>
                                 <td class="py-3 font-bold text-emerald-600 text-sm"
-                                    th:text="${d.pointsEarned > 0} ? '+' + ${#numbers.formatDecimal(d.pointsEarned,1,0)} : '-'">-</td>
+                                    th:text="${d.pointsEarned != null and d.pointsEarned > 0} ? '+' + ${#numbers.formatDecimal(d.pointsEarned,1,0)} : '-'">-</td>
                                 <td class="py-3">
                                     <span class="badge"
                                           th:classappend="${d.status.name() == 'CONFIRMED'} ? 'badge-confirmed' : (${d.status.name() == 'REJECTED'} ? 'badge-rejected' : 'badge-pending')"
@@ -345,7 +345,7 @@
                                 </td>
                                 <td class="px-4 py-4 text-gray-700 text-sm font-semibold" th:text="${#numbers.formatDecimal(d.weightKg,1,1)} + ' kg'">0</td>
                                 <td class="px-4 py-4 font-bold text-emerald-600 text-sm"
-                                    th:text="${d.pointsEarned > 0} ? '+' + ${#numbers.formatDecimal(d.pointsEarned,1,0)} : '-'">-</td>
+                                    th:text="${d.pointsEarned != null and d.pointsEarned > 0} ? '+' + ${#numbers.formatDecimal(d.pointsEarned,1,0)} : '-'">-</td>
                                 <td class="px-4 py-4">
                                     <div th:if="${d.imageUrl != null}" class="w-10 h-10 rounded-lg overflow-hidden border border-gray-100 shadow-sm">
                                         <img th:src="${d.imageUrl}" class="w-full h-full object-cover cursor-pointer hover:scale-110 transition-transform"
@@ -456,8 +456,12 @@
                                 <td class="px-4 py-4 font-mono text-gray-500 text-xs" th:text="${c.nik != null ? c.nik : '-'}">-</td>
                                 <td class="px-4 py-4 text-gray-700 text-sm font-semibold" th:text="${c.totalDeposits}">0</td>
                                 <td class="px-4 py-4 text-emerald-600 font-bold text-sm"
-                                    th:text="${#numbers.formatDecimal(c.totalPoints, 1, 0)}">0</td>
-                                <td class="px-4 py-4 text-gray-500 text-xs" th:text="${c.availablePoints >= 1000 ? '⭐' : '🌱'} + ' ' + (${c.totalPoints >= 10000 ? 'Platinum' : c.totalPoints >= 5000 ? 'Gold' : c.totalPoints >= 1000 ? 'Silver' : 'Starter'})">🌱 Starter</td>
+                                    th:text="${#numbers.formatDecimal(c.totalPoints != null ? c.totalPoints : 0, 1, 0)}">0</td>
+                                 <td class="px-4 py-4 text-gray-500 text-xs" 
+                                     th:with="availP=${c.availablePoints != null ? c.availablePoints : 0.0}, totalP=${c.totalPoints != null ? c.totalPoints : 0.0}">
+                                     <span th:text="${availP >= 1000 ? '⭐' : '🌱'}"></span>
+                                     <span th:text="${totalP >= 10000 ? 'Platinum' : (totalP >= 5000 ? 'Gold' : (totalP >= 1000 ? 'Silver' : 'Starter'))}">Starter</span>
+                                 </td>
                                 <td class="px-4 py-4">
                                     <form th:action="@{/admin/citizens/{id}/toggle(id=${c.id})}" method="POST">
                                         <input type="hidden" name="page" th:value="${citizens.number}">
@@ -664,100 +668,103 @@
         <!-- =================== TAB: REDEMPTIONS =================== -->
         <div x-show="activeTab === 'redemptions'" class="space-y-6 animate-in" style="display:none;">
 
-            <!-- Sub-tab toggle -->
-            <div class="flex gap-2 bg-gray-100 p-1 rounded-2xl w-fit" x-data="{rdTab:'pending'}">
-                <button @click="rdTab='pending'" :class="rdTab==='pending' ? 'bg-white shadow text-emerald-700' : 'text-gray-500'"
-                        class="px-5 py-2 rounded-xl text-sm font-bold transition-all flex items-center gap-2">
-                    ⏳ Menunggu
-                    <span class="bg-amber-500 text-white text-xs px-2 py-0.5 rounded-full" th:text="${redemptions.totalElements}">0</span>
-                </button>
-                <button @click="rdTab='history'" :class="rdTab==='history' ? 'bg-white shadow text-emerald-700' : 'text-gray-500'"
-                        class="px-5 py-2 rounded-xl text-sm font-bold transition-all">
-                    📜 Riwayat
-                </button>
-
-            <!-- SUB-TAB PENDING -->
-            <div x-show="rdTab==='pending'" class="card p-6">
-                <div class="flex items-center justify-between mb-6">
-                    <div>
-                        <h3 class="font-bold text-gray-800 text-lg">Persetujuan Penukaran Poin</h3>
-                        <p class="text-gray-400 text-sm">Validasi pengajuan warga yang ingin menukar poinnya.</p>
-                    </div>
+            <!-- Sub-tab toggle bar -->
+            <div x-data="{rdTab:'pending'}">
+                <div class="flex gap-2 bg-gray-100 p-1 rounded-2xl w-fit mb-6">
+                    <button @click="rdTab='pending'" :class="rdTab==='pending' ? 'bg-white shadow text-emerald-700' : 'text-gray-500'"
+                            class="px-5 py-2 rounded-xl text-sm font-bold transition-all flex items-center gap-2">
+                        ⏳ Menunggu
+                        <span class="bg-amber-500 text-white text-xs px-2 py-0.5 rounded-full" th:text="${redemptions.totalElements}">0</span>
+                    </button>
+                    <button @click="rdTab='history'" :class="rdTab==='history' ? 'bg-white shadow text-emerald-700' : 'text-gray-500'"
+                            class="px-5 py-2 rounded-xl text-sm font-bold transition-all">
+                        📜 Riwayat
+                    </button>
                 </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div th:each="r : ${redemptions.content}" class="border border-gray-200 rounded-2xl p-5 bg-white shadow-sm hover:shadow-md transition-all">
-                        <div class="flex justify-between items-start mb-3">
-                            <div>
-                                <h4 class="font-bold text-gray-900" th:text="${r.citizen.name}">Nama Warga</h4>
-                                <p class="text-xs text-gray-500" th:text="${#temporals.format(r.createdAt, 'dd MMM yyyy, HH:mm')}">Tgl</p>
+
+                <!-- SUB-TAB PENDING -->
+                <div x-show="rdTab==='pending'" class="card p-6">
+                    <div class="flex items-center justify-between mb-6">
+                        <div>
+                            <h3 class="font-bold text-gray-800 text-lg">Persetujuan Penukaran Poin</h3>
+                            <p class="text-gray-400 text-sm">Validasi pengajuan warga yang ingin menukar poinnya.</p>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div th:each="r : ${redemptions.content}" class="border border-gray-200 rounded-2xl p-5 bg-white shadow-sm hover:shadow-md transition-all">
+                            <div class="flex justify-between items-start mb-3">
+                                <div>
+                                    <h4 class="font-bold text-gray-900" th:text="${r.citizen != null ? r.citizen.name : 'Warga'}">Nama Warga</h4>
+                                    <p class="text-xs text-gray-500" th:text="${#temporals.format(r.createdAt, 'dd MMM yyyy, HH:mm')}">Tgl</p>
+                                </div>
+                                <span class="bg-purple-100 text-purple-700 font-black px-3 py-1 rounded-lg text-sm"
+                                      th:text="${#numbers.formatDecimal(r.pointsRedeemed, 1, 0)} + ' pts'">100 pts</span>
                             </div>
-                            <span class="bg-purple-100 text-purple-700 font-black px-3 py-1 rounded-lg text-sm"
-                                  th:text="${#numbers.formatDecimal(r.pointsRedeemed, 1, 0)} + ' pts'">100 pts</span>
+                            <div class="bg-gray-50 rounded-xl p-4 mb-4 border border-gray-100">
+                                <p class="text-xs text-gray-400 font-semibold mb-1">Permintaan Reward:</p>
+                                <p class="font-semibold text-gray-800 text-sm" th:text="${r.description}">Deskripsi</p>
+                            </div>
+                            <div class="flex gap-2">
+                                <!-- Approve: buka modal AlpineJS -->
+                                <button type="button"
+                                        th:data-id="${r.id}"
+                                        @click="openApproveModal($el.dataset.id)"
+                                        class="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-2 rounded-xl text-sm transition-colors">
+                                    ✓ Setujui
+                                </button>
+                                <!-- Reject: buka modal AlpineJS -->
+                                <button type="button"
+                                        th:data-id="${r.id}"
+                                        @click="openRejectModal($el.dataset.id)"
+                                        class="flex-1 bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 font-bold py-2 rounded-xl text-sm transition-colors">
+                                    ✕ Tolak
+                                </button>
+                            </div>
                         </div>
-                        <div class="bg-gray-50 rounded-xl p-4 mb-4 border border-gray-100">
-                            <p class="text-xs text-gray-400 font-semibold mb-1">Permintaan Reward:</p>
-                            <p class="font-semibold text-gray-800 text-sm" th:text="${r.description}">Deskripsi</p>
-                        </div>
-                        <div class="flex gap-2">
-                            <!-- Approve: buka modal AlpineJS, bukan prompt() -->
-                            <button type="button"
-                                    th:attr="@click='openApproveModal(&quot;' + ${r.id} + '&quot;)'"
-                                    class="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-2 rounded-xl text-sm transition-colors">
-                                ✓ Setujui
-                            </button>
-                            <!-- Reject: buka modal AlpineJS -->
-                            <button type="button"
-                                    th:attr="@click='openRejectModal(&quot;' + ${r.id} + '&quot;)'"
-                                    class="flex-1 bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 font-bold py-2 rounded-xl text-sm transition-colors">
-                                ✕ Tolak
-                            </button>
+                        <div th:if="${redemptions.content.empty}" class="col-span-full py-16 text-center bg-gray-50 rounded-3xl border-2 border-dashed border-gray-200">
+                            <div class="text-5xl mb-4">🎉</div>
+                            <h3 class="text-xl font-bold text-gray-800">Semua beres!</h3>
+                            <p class="text-gray-500 mt-2">Tidak ada permintaan penukaran yang menunggu saat ini.</p>
                         </div>
                     </div>
-                    <div th:if="${redemptions.content.empty}" class="col-span-full py-16 text-center bg-gray-50 rounded-3xl border-2 border-dashed border-gray-200">
-                        <div class="text-5xl mb-4">🎉</div>
-                        <h3 class="text-xl font-bold text-gray-800">Semua beres!</h3>
-                        <p class="text-gray-500 mt-2">Tidak ada permintaan penukaran yang menunggu saat ini.</p>
+                </div>
+
+                <!-- SUB-TAB HISTORY -->
+                <div x-show="rdTab==='history'" style="display:none;" class="card p-6">
+                    <h3 class="font-bold text-gray-800 text-lg mb-6">Riwayat Penukaran Poin</h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead>
+                                <tr class="text-left bg-gray-50">
+                                    <th class="px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Warga</th>
+                                    <th class="px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Poin</th>
+                                    <th class="px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Deskripsi</th>
+                                    <th class="px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Status</th>
+                                    <th class="px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Catatan Admin</th>
+                                    <th class="px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Tanggal</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-50">
+                                <tr th:each="r : ${redemptionHistory.content}" class="hover:bg-gray-50/50 transition-colors">
+                                    <td class="px-4 py-3 font-semibold text-gray-800 text-sm" th:text="${r.citizen != null ? r.citizen.name : 'Warga'}">Nama</td>
+                                    <td class="px-4 py-3 font-bold text-purple-600 text-sm" th:text="${#numbers.formatDecimal(r.pointsRedeemed,1,0)} + ' pts'">0</td>
+                                    <td class="px-4 py-3 text-gray-600 text-sm" th:text="${r.description}">-</td>
+                                    <td class="px-4 py-3">
+                                        <span class="badge"
+                                              th:classappend="${r.status.name() == 'APPROVED'} ? 'badge-confirmed' : (${r.status.name() == 'REJECTED'} ? 'badge-rejected' : 'badge-pending')"
+                                              th:text="${r.status.name() == 'APPROVED'} ? '✓ Disetujui' : (${r.status.name() == 'REJECTED'} ? '✕ Ditolak' : '⏳ Menunggu')">Status</span>
+                                    </td>
+                                    <td class="px-4 py-3 text-gray-500 text-xs" th:text="${r.adminNotes != null ? r.adminNotes : '-'}">-</td>
+                                    <td class="px-4 py-3 text-gray-400 text-xs" th:text="${#temporals.format(r.createdAt,'dd MMM yyyy')}">-</td>
+                                </tr>
+                                <tr th:if="${redemptionHistory.content.empty}">
+                                    <td colspan="6" class="py-8 text-center text-gray-400">Belum ada riwayat penukaran</td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
-            </div>
-
-            <!-- SUB-TAB HISTORY -->
-            <div x-show="rdTab==='history'" class="card p-6">
-                <h3 class="font-bold text-gray-800 text-lg mb-6">Riwayat Penukaran Poin</h3>
-                <div class="overflow-x-auto">
-                    <table class="w-full">
-                        <thead>
-                            <tr class="text-left bg-gray-50">
-                                <th class="px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Warga</th>
-                                <th class="px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Poin</th>
-                                <th class="px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Deskripsi</th>
-                                <th class="px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Status</th>
-                                <th class="px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Catatan Admin</th>
-                                <th class="px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Tanggal</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-gray-50">
-                            <tr th:each="r : ${redemptionHistory.content}" class="hover:bg-gray-50/50 transition-colors">
-                                <td class="px-4 py-3 font-semibold text-gray-800 text-sm" th:text="${r.citizen.name}">Nama</td>
-                                <td class="px-4 py-3 font-bold text-purple-600 text-sm" th:text="${#numbers.formatDecimal(r.pointsRedeemed,1,0)} + ' pts'">0</td>
-                                <td class="px-4 py-3 text-gray-600 text-sm" th:text="${r.description}">-</td>
-                                <td class="px-4 py-3">
-                                    <span class="badge"
-                                          th:classappend="${r.status.name() == 'APPROVED'} ? 'badge-confirmed' : (${r.status.name() == 'REJECTED'} ? 'badge-rejected' : 'badge-pending')"
-                                          th:text="${r.status.name() == 'APPROVED'} ? '✓ Disetujui' : (${r.status.name() == 'REJECTED'} ? '✕ Ditolak' : '⏳ Menunggu')">Status</span>
-                                </td>
-                                <td class="px-4 py-3 text-gray-500 text-xs" th:text="${r.adminNotes != null ? r.adminNotes : '-'}">-</td>
-                                <td class="px-4 py-3 text-gray-400 text-xs" th:text="${#temporals.format(r.createdAt,'dd MMM yyyy')}">-</td>
-                            </tr>
-                            <tr th:if="${redemptionHistory.content.empty}">
-                                <td colspan="6" class="py-8 text-center text-gray-400">Belum ada riwayat penukaran</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            </div><!-- end x-data rdTab -->
+            </div> <!-- end x-data rdTab scope -->
         </div><!-- End Redemptions Tab -->
 
         <!-- =================== TAB: REPORTS =================== -->
@@ -1062,7 +1069,7 @@
                     class="w-9 h-9 bg-gray-100 hover:bg-gray-200 rounded-xl flex items-center justify-center text-gray-500 transition-colors">✕</button>
         </div>
         <p class="text-gray-500 text-sm mb-4">Masukkan catatan untuk warga (opsional).</p>
-        <form th:action="@{/admin/redemptions/__}" method="POST"
+        <form th:action="@{/admin/redemptions/0}" method="POST"
               :action="'/admin/redemptions/' + selectedRedemptionId + '/approve'">
             <div class="mb-4">
                 <label class="block text-sm font-semibold text-gray-700 mb-1">Catatan Admin (Opsional)</label>
@@ -1092,7 +1099,7 @@
                     class="w-9 h-9 bg-gray-100 hover:bg-gray-200 rounded-xl flex items-center justify-center text-gray-500 transition-colors">✕</button>
         </div>
         <p class="text-gray-500 text-sm mb-4">Berikan alasan penolakan untuk warga.</p>
-        <form th:action="@{/admin/redemptions/__}" method="POST"
+        <form th:action="@{/admin/redemptions/0}" method="POST"
               :action="'/admin/redemptions/' + selectedRedemptionId + '/reject'">
             <div class="mb-4">
                 <label class="block text-sm font-semibold text-gray-700 mb-1">Alasan Penolakan *</label>
@@ -1174,7 +1181,7 @@
             <button @click="showEditCategoryModal=false"
                     class="w-9 h-9 bg-gray-100 hover:bg-gray-200 rounded-xl flex items-center justify-center text-gray-500 transition-colors">✕</button>
         </div>
-        <form th:action="@{/admin/categories/__}" method="POST"
+        <form th:action="@{/admin/categories/0/edit}" method="POST"
               :action="'/admin/categories/' + editingCategory.id + '/edit'"
               class="space-y-4">
             <div>

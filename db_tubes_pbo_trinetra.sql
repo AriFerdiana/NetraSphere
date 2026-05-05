@@ -1,4 +1,4 @@
--- --------------------------------------------------------
+﻿-- --------------------------------------------------------
 -- Host:                         127.0.0.1
 -- Server version:               8.0.45 - MySQL Community Server - GPL
 -- Server OS:                    Win64
@@ -19,6 +19,88 @@
 CREATE DATABASE IF NOT EXISTS `db_tubes_pbo_trinetra` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
 USE `db_tubes_pbo_trinetra`;
 
+
+-- Dumping structure for table db_tubes_pbo_trinetra.users
+CREATE TABLE IF NOT EXISTS `users` (
+  `user_type` varchar(31) NOT NULL,
+  `id` varchar(36) NOT NULL,
+  `created_at` datetime(6) NOT NULL,
+  `updated_at` datetime(6) NOT NULL,
+  `active` bit(1) NOT NULL,
+  `email` varchar(150) NOT NULL,
+  `name` varchar(100) NOT NULL,
+  `password` varchar(255) NOT NULL,
+  `phone` varchar(20) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `UK_6dotkott2kjsp8vw4d0m25fb7` (`email`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- Dumping data for table db_tubes_pbo_trinetra.users: ~64 rows (approximately)
+INSERT INTO `users` (`user_type`, `id`, `created_at`, `updated_at`, `active`, `email`, `name`, `password`, `phone`) VALUES
+	('CITIZEN', '0da6dd2b-486c-4e0e-a99e-83d7a36d155f', '2026-04-12 21:43:54.472595', '2026-04-12 22:18:00.882334', b'1', 'warga@smartwaste.com', 'Ahmad Kamarudin', '$2a$12$Q6Q3XB3CKThsOZnCfzvW1O.Y467e10aEg7kU4TI7Ebmo/lWQaDWRi', '081222333444'),
+	('CITIZEN', '0fb8dd2e-679d-4c87-b837-6964b9526fa7', '2026-04-26 15:25:57.203304', '2026-04-26 15:25:57.203304', b'1', 'warga49@smartwaste.com', 'Ahmad Wijaya', '$2a$12$u/57qs1leim9ckdq5FFAkuS.9Cnss/nV7KADTgtuV/5dGGPd2wAlO', '081212686046'),
+	('CITIZEN', '10e873da-3daf-47d6-8045-faee4402daf1', '2026-04-26 15:25:26.973140', '2026-04-26 15:25:26.973140', b'1', 'warga14@smartwaste.com', 'Dwi Nugroho', '$2a$12$niW8t8omo1IUhvF8y7PlUeL9WvNVTTlL/t8A1sKCeD1.dq.e9ikqi', '081240877529'),
+	('COLLECTOR', '130ebb9c-624f-4dc3-924c-7ed9c5c9af6b', '2026-04-26 20:58:23.436232', '2026-04-26 21:51:29.452663', b'1', 'petugas10@smartwaste.com', 'Joko Susilo', '$2a$12$Nsqw/3XBwpY1sWbe7KSyz.pB4DSLHrmNcvaauMwtNeEVE03eBnkZG', '081100000009'),
+	('CITIZEN', '1506fec1-f2ff-4bc8-99a0-8c56ae0f7007', '2026-04-26 15:25:56.316153', '2026-04-26 15:25:56.316153', b'1', 'warga48@smartwaste.com', 'Adi Susanto', '$2a$12$.jPNE/rOwTWLopZCxWwOs./VyAyibmlm4CNpk4Li5PKiiqTVhV9lC', '081284761333'),
+	('CITIZEN', '18b62ad3-019a-48dd-b3e0-d4801e35b97f', '2026-04-26 15:25:14.491139', '2026-04-26 15:25:14.491139', b'1', 'warga2@smartwaste.com', 'Siti Nugroho', '$2a$12$ppcIYbcOwFaRf8V52dyrJ.j.qisRIQKcsoWXKdXWNO/otNwpv7xMW', '081235035324'),
+	('COLLECTOR', '1a61e6a1-3df0-4460-ac64-df177a973473', '2026-04-26 20:58:17.615620', '2026-04-26 21:51:29.402267', b'1', 'petugas3@smartwaste.com', 'Suryo Utomo', '$2a$12$Cy14RMvK4rKVq9D99kkK7eACmb.8k/sO/D3GEDjK1PBO.NwP2v1d6', '081100000002'),
+	('COLLECTOR', '208a695d-6515-4ee7-bef7-8aa87b1fe88e', '2026-04-26 20:58:19.263616', '2026-04-26 21:51:28.668666', b'1', 'petugas5@smartwaste.com', 'Eko Prasetyo', '$2a$12$woxn5ceyxcqkREZjB97FCe4lPeW7yvgXA2Kl2f76itdQ34hF4fo9u', '081100000004'),
+	('ADMIN', '20d4665a-19dc-4c6b-9d6a-822422ed3af2', '2026-04-12 21:31:26.663096', '2026-04-12 21:31:26.663096', b'1', 'admin@smartwaste.com', 'Super Admin', '$2a$12$.BNutnHqMakkPlf.enMIL./ujc2sTCW9o7uPa/tVPwnF5RdEdlebq', '08100000001'),
+	('CITIZEN', '220150b6-a277-4a6e-b467-6152fe1c23ed', '2026-04-26 15:25:55.428887', '2026-04-26 15:25:55.428887', b'1', 'warga47@smartwaste.com', 'Hendra Pangestu', '$2a$12$QQH7UW7/ZuYOFxiiG5lX7eUGJhAvMRTpCMygc6UTfwbe.bTUpFnd.', '081234371663'),
+	('COLLECTOR', '245b8746-cf46-4a94-9148-58dd0315f2b5', '2026-04-12 21:31:27.724937', '2026-04-28 09:12:50.957732', b'1', 'petugas@smartwaste.com', 'Budi Santoso', '$2a$12$mPvwrigOT9oXcK7v7koV8.hJr5xJvYg/FSiSyTZkrran/dImB2JE2', '08100000002'),
+	('COLLECTOR', '2df99938-98b4-4472-a4c0-36cbee6be073', '2026-04-26 20:58:16.787396', '2026-04-26 21:51:29.212789', b'1', 'petugas2@smartwaste.com', 'Andi Wijaya', '$2a$12$0u.70kOHacqmXEFkaIwzqumsciHOTGwDWwVTnSPI287JvYxKCek..', '081100000001'),
+	('COLLECTOR', '35a41428-3349-45ef-af40-fcbaaa42a3c7', '2026-04-26 20:58:22.594282', '2026-04-26 21:51:29.509249', b'1', 'petugas9@smartwaste.com', 'Indra Kusuma', '$2a$12$04Zv0z2/NmSkGxcC7ISor.8FSHHR9LEdQZrcx4JBSEZ0MJ45RFozm', '081100000008'),
+	('CITIZEN', '36f06de1-3827-4a6c-986e-9bacbcb4d4f4', '2026-04-26 15:25:27.837424', '2026-04-26 15:25:27.837424', b'1', 'warga15@smartwaste.com', 'Ahmad Pangestu', '$2a$12$zlT4z823lJFlsEm6pF2kYuZV0vdQwszYszoIa4mfk0ohROIwDjPsW', '081215524418'),
+	('CITIZEN', '38e4112c-2738-418f-9583-6b71903324d6', '2026-04-26 15:25:40.816896', '2026-04-26 15:25:40.816896', b'1', 'warga30@smartwaste.com', 'Eko Hidayat', '$2a$12$SOtuKqZPVt5PV56gvc1Wo.Sf4XDLFWXtdYqyRtWR6svDfxDEfUR4u', '081221349493'),
+	('CITIZEN', '3b4d284b-cd14-4940-8aac-ea5a2a917ab6', '2026-04-26 15:25:53.745801', '2026-04-26 15:25:53.745801', b'1', 'warga45@smartwaste.com', 'Sari Saputra', '$2a$12$fdsznn6Mt2TjlvhTUBP9SOXK.bQx7LtnBtR/NTvRMXMxcDNsZcGEO', '081293752329'),
+	('CITIZEN', '3c413d07-5996-4313-8401-011b46ebf9e1', '2026-04-26 15:25:13.224348', '2026-04-26 15:25:13.224348', b'1', 'warga1@smartwaste.com', 'Putri Wijaya', '$2a$12$l1Hjuh4ypMGSRSqObADpLOPjgMSOjvYMZb3t2UEm4eUQP4e/GYpnK', '081242318276'),
+	('COLLECTOR', '4094bc42-9bd0-40ac-889c-345de5ad6198', '2026-04-12 21:31:28.804002', '2026-04-12 21:31:28.804002', b'1', 'robot001@netradump.iot', 'Robot NetraDUMP-001', '$2a$12$Ig1xw/sHZFQZStMVMwxcU.TJTsoK2xcpgJP4dUsLw6xHveAhdlHLG', NULL),
+	('CITIZEN', '4296719f-5bc4-4c7e-899f-c6718bc96c1a', '2026-04-26 15:25:26.173243', '2026-04-26 15:25:26.173243', b'1', 'warga13@smartwaste.com', 'Ratna Pangestu', '$2a$12$M73YNW7o/I6B11O4daHbFO4hqhoE1EhHZs4WaZ0S70RD3INpUVDd6', '081217660915'),
+	('CITIZEN', '43095137-df51-4004-b68d-b31d1e3adb20', '2026-04-26 15:25:44.177246', '2026-04-26 15:25:44.177246', b'1', 'warga34@smartwaste.com', 'Adi Pratama', '$2a$12$bFbdmUXZroYZD8tn5FaijO7vRCAAYpeD6wU1JpiIhUVvH110VHdX2', '081243676838'),
+	('CITIZEN', '482c6ffd-db87-40fb-b8a7-eb962c9ddb30', '2026-04-26 15:25:38.241026', '2026-04-26 15:25:38.241026', b'1', 'warga27@smartwaste.com', 'Eko Lubis', '$2a$12$WiDHcNtu7jJg5ThdHjiYuek11HZW5nOtUyoxrYMdo/LaTBDXKC.6q', '081216492315'),
+	('CITIZEN', '4981c6f4-bf64-4ba2-8bd8-54a3d89c1935', '2026-04-26 15:25:47.584052', '2026-04-26 15:25:47.584052', b'1', 'warga38@smartwaste.com', 'Sari Wahyudi', '$2a$12$f4l3yy.8uKoKplRu54X5xuf0Vzi8qWkKvOEprdRCEgEQdMoQ5H8P2', '081253053330'),
+	('CITIZEN', '5f788d55-dfcf-456f-8c1e-c1df967691d5', '2026-04-26 15:25:35.547524', '2026-04-26 15:25:35.547524', b'1', 'warga24@smartwaste.com', 'Lestari Sihombing', '$2a$12$N5FsOOuUYM2EWW7rkzJX1erhPemm2hu3/kZekTGcAYPX4rOpIkzdu', '081216446844'),
+	('CITIZEN', '5f82c431-faab-4f52-9946-477a5403f451', '2026-04-26 15:25:39.107587', '2026-04-26 15:25:39.107587', b'1', 'warga28@smartwaste.com', 'Siti Pangestu', '$2a$12$KmUuEEL/d5K.qcxPzm9.fO8WgqxC/7VyBBkntKcS0rR8jJTr1xnqS', '081294299977'),
+	('CITIZEN', '62e88cb0-1c54-4f23-bfc7-2eab9db66a46', '2026-04-26 15:25:25.227690', '2026-04-26 15:25:25.227690', b'1', 'warga12@smartwaste.com', 'Dwi Wahyudi', '$2a$12$i9oV3rzqr9jjIiVs/Rp64.PeDTpC0yverwlXJX9/IMYe2wDZCEbsO', '081256308580'),
+	('CITIZEN', '71b10466-8e32-49d2-bdc5-814c7387915b', '2026-04-26 15:25:46.730338', '2026-04-26 15:25:46.730338', b'1', 'warga37@smartwaste.com', 'Dwi Hidayat', '$2a$12$jW6gE0oyi3zMaM/xHQ41.eoHLQY/8QVPB0f7j9yqvHfV8pYy.CrBW', '081279667706'),
+	('CITIZEN', '735016c5-7255-46ee-9031-9ed94a27d90f', '2026-04-26 15:25:28.734938', '2026-04-26 15:25:28.734938', b'1', 'warga16@smartwaste.com', 'Sri Kusuma', '$2a$12$/gvsvi8kQHgpsi7DNnk3X.VF1Ujimkuxh/lXxrwTVMWwga5.5Yltm', '081245578393'),
+	('CITIZEN', '7b644e69-dde6-45e9-864e-6d1eee7ff0c5', '2026-04-26 15:25:45.888351', '2026-04-26 15:25:45.888351', b'1', 'warga36@smartwaste.com', 'Budi Sihombing', '$2a$12$7GOUWvu0LPF1bUN.4/DSfuaEzrejnjsrHC9ab/bt/eGjARZO7D4di', '081224794096'),
+	('CITIZEN', '7d2ccc7a-c37c-4c88-87d1-bc474486fb6a', '2026-04-26 15:25:41.643795', '2026-04-26 15:25:41.643795', b'1', 'warga31@smartwaste.com', 'Siti Pratama', '$2a$12$4T/SCQ0.T071Po1bQuso..cP6yp4KtCx97gaUtjS6tvRLg5WKm7di', '081282545606'),
+	('CITIZEN', '7f02c92e-ac34-49a8-8698-b32986ea2ee1', '2026-04-26 15:25:45.054666', '2026-04-26 15:25:45.054666', b'1', 'warga35@smartwaste.com', 'Nur Nugroho', '$2a$12$.LOd5EupcGLDebH8.qoUIORewXCDqcsH/dhs1Zfjr5Xr1KVr8W8NO', '081211584378'),
+	('CITIZEN', '7fda2150-942f-4283-b964-cdf04e467c10', '2026-04-26 15:25:54.599292', '2026-04-26 15:25:54.599292', b'1', 'warga46@smartwaste.com', 'Ahmad Pratama', '$2a$12$57rTKBvwL8QqMtOvJtduKO1B.HN0rVdFhAtBg.P26ogSj9EKdzSau', '081284282553'),
+	('CITIZEN', '83741056-db1c-43a6-9ad7-3a12e2d75d06', '2026-04-26 15:25:24.146475', '2026-04-26 15:25:24.146475', b'1', 'warga11@smartwaste.com', 'Sri Firmansyah', '$2a$12$H9tkxY20/17c1/BwF5K/DuADDoIlosli1VN98mOkKhhFqml3tGsbu', '081263476431'),
+	('CITIZEN', '85945231-e152-43ae-8b76-d6a27d999e8b', '2026-04-26 15:25:32.915126', '2026-04-26 15:25:32.915126', b'1', 'warga21@smartwaste.com', 'Hendra Saputra', '$2a$12$Y34LQeeJosSYbF6LIiEpU.nWA9r5xQGn7oLZvppNVA9y/o42qMUni', '081289330095'),
+	('CITIZEN', '88c9c96f-639a-44b0-ac1e-ceca300374c0', '2026-04-26 15:25:42.482750', '2026-04-26 15:25:42.482750', b'1', 'warga32@smartwaste.com', 'Dwi Santoso', '$2a$12$uqNaTOM55Kw3R91eUNpCweO2AVGDRmnqxlh9ZYQN4n4vLSe7pFn1i', '081233013622'),
+	('CITIZEN', '8fe94d3d-1a51-41d8-a0ca-b9e2e49959c3', '2026-04-26 15:25:16.717062', '2026-04-26 15:25:16.717062', b'1', 'warga4@smartwaste.com', 'Ayu Pratama', '$2a$12$uZPVTWat/C6DTuI0bcOv3uwD0roN0HMWo5t3pviy8I57/1AvY91zm', '081262113232'),
+	('CITIZEN', '93bc354a-e558-4ea4-a613-7c8ed28dff63', '2026-04-26 15:25:17.840810', '2026-04-26 15:25:17.840810', b'1', 'warga5@smartwaste.com', 'Dwi Nugroho', '$2a$12$IF0Py.MlX1UnIZpOnX9UaOfAKrV3O0QkhOKKe4vz6PBHo09PwB3pO', '081234411547'),
+	('COLLECTOR', '956186bd-4a29-4e18-a49d-180ad4289cf7', '2026-04-26 20:58:21.769996', '2026-04-26 21:51:28.813326', b'1', 'petugas8@smartwaste.com', 'Heri Setiawan', '$2a$12$d/WjcrEjNM2O89PyVunf5.LqTSehW7nc38LvCo2arpGZoxcKSGQiS', '081100000007'),
+	('COLLECTOR', '98419feb-da21-4d78-97bf-62a2199d6c8c', '2026-04-26 20:58:18.436372', '2026-04-26 21:51:28.968364', b'1', 'petugas4@smartwaste.com', 'Dedi Kurniawan', '$2a$12$AyCA7h5qe2Mpc5AovvygR.HyDkTLheQWQMRE3zQLyXIcgk9grJ2n.', '081100000003'),
+	('COLLECTOR', '9a398868-8a1f-4e30-9872-e887e380af93', '2026-04-26 20:58:20.936234', '2026-04-26 21:51:29.312481', b'1', 'petugas7@smartwaste.com', 'Guntur Saputra', '$2a$12$rxM8DYR/o/h1dULNCDSO/eJmGH1y4STgDE.SwafsqCTwwbKyKsdOy', '081100000006'),
+	('CITIZEN', '9e1ec042-85f8-4272-94f1-d7e7cfb8f5d3', '2026-04-26 15:25:37.332938', '2026-04-26 15:25:37.332938', b'1', 'warga26@smartwaste.com', 'Nur Santoso', '$2a$12$ZVQV4J4Bv9fkS/AFCCCaPeyEq23bV6ZgdD1QUmccLFOtqT8501rRW', '081289661041'),
+	('CITIZEN', '9fdfd91d-f237-4346-9c38-04fb9be9a98c', '2026-04-26 15:25:32.058957', '2026-04-26 15:25:32.058957', b'1', 'warga20@smartwaste.com', 'Eko Firmansyah', '$2a$12$LL6kVgpS4ZzQ4XdW8z2tyeenrpqHA2XQ8PdP8VaN6xdSdNCAtjdf6', '081256061643'),
+	('CITIZEN', 'a085dd41-6103-4858-a2b0-417dbb93de09', '2026-04-26 15:25:49.525926', '2026-04-26 15:25:49.525926', b'1', 'warga40@smartwaste.com', 'Rini Kusuma', '$2a$12$WFwhBvO5dxQSGK7qt0D89ejaZA6iAxrXZi3h2kVFhCvrylZ.0HOSi', '081237236771'),
+	('CITIZEN', 'a1fdb247-7f63-414a-b34e-5f379a505c55', '2026-04-26 15:25:30.407644', '2026-04-26 15:25:30.407644', b'1', 'warga18@smartwaste.com', 'Adi Wahyudi', '$2a$12$C2B0CQVsLlIH6DMor/Rn5OBWgj1maDKvYyPJNxabgp1IhnuQBckFO', '081282648849'),
+	('COLLECTOR', 'b74ccbf8-270e-4222-88ec-44fd9d1f15d5', '2026-04-26 20:58:20.095330', '2026-04-26 21:51:29.057812', b'1', 'petugas6@smartwaste.com', 'Fajar Ramadhan', '$2a$12$VRiyqSraZbGDw1ubY1Cnf.QBUHxYwzojlE1141ncuD8DS1QefTKWa', '081100000005'),
+	('CITIZEN', 'b8566336-b51f-49d4-a838-dbac75545acc', '2026-04-26 15:25:39.944908', '2026-04-26 15:25:39.944908', b'1', 'warga29@smartwaste.com', 'Ahmad Lubis', '$2a$12$Q5W2XI3O260zGwB4GGPIjeyo6waqQsuM9vAcMcXe1wKOp7Udc1zaS', '081273999141'),
+	('CITIZEN', 'bd2dc7f2-90dd-4644-9c9f-0241edaab70b', '2026-04-26 15:25:51.253782', '2026-04-26 15:25:51.253782', b'1', 'warga42@smartwaste.com', 'Lestari Pangestu', '$2a$12$fHFnG.eCXcWZOl1IzG5uleJJ8Ri26FTm88VyDPWGBL.2TaooBiQhu', '081224439218'),
+	('CITIZEN', 'bffb0d79-03cf-4a88-9219-b00db794c1f6', '2026-04-26 15:25:22.277229', '2026-04-26 15:25:22.277229', b'1', 'warga9@smartwaste.com', 'Agus Wahyudi', '$2a$12$x2GezrdHwxC3phFHwciIWOUU9fpEY5QYMrd9A0IyeKWSgr91nqCUK', '081254338303'),
+	('CITIZEN', 'c0f5bf5a-94a4-42e7-8a3a-c30a9ca10faf', '2026-04-26 15:25:36.405214', '2026-04-26 15:25:36.405214', b'1', 'warga25@smartwaste.com', 'Eko Siregar', '$2a$12$i9m4uD1sx47IPMRe0fU0U.33on3qAGzq19ABNrU9/MYCf/29YwkTq', '081211051897'),
+	('CITIZEN', 'c230d565-bf47-4ecb-a9c3-9f01a854eb0d', '2026-04-26 15:25:23.168092', '2026-04-26 15:25:23.168092', b'1', 'warga10@smartwaste.com', 'Eko Pangestu', '$2a$12$V.AsWQG5AFnvRW9XQaF8r.bVR9/pjqkexb.l.XMA06ulVKQS8xMrO', '081281255105'),
+	('CITIZEN', 'c661afad-1d0d-481f-87f9-8655bbb2a105', '2026-04-26 15:25:19.160217', '2026-04-26 15:25:19.160217', b'1', 'warga6@smartwaste.com', 'Ratna Kusuma', '$2a$12$z3Sw4yHEBcOcK5SI6VWyZ.snMcs4k0G8IWU1Wxl2WQ5xLdyKdAytu', '081273950104'),
+	('CITIZEN', 'c96f1890-97aa-4284-be5d-89130bc13f32', '2026-04-26 15:25:48.478492', '2026-04-26 15:25:48.478492', b'1', 'warga39@smartwaste.com', 'Sari Wahyudi', '$2a$12$7ElNd9M0lAl8uPLp4Qz5B.pG1PtD8gOIWv98SCItY0/48Dt2yjdl6', '081227169283'),
+	('CITIZEN', 'ce9dd90d-0a34-490f-ab94-95f5edc129bd', '2026-04-26 15:25:21.268470', '2026-04-26 15:25:21.268470', b'1', 'warga8@smartwaste.com', 'Dewi Siregar', '$2a$12$1PgwifZpi/LX7akFmps3BuaYH3/ZsKCWTWffrNhk0joWusVvanqTi', '081241778923'),
+	('CITIZEN', 'd5f5c72d-3971-4a5a-842b-375b03183b8c', '2026-04-26 15:25:29.601895', '2026-04-26 15:25:29.601895', b'1', 'warga17@smartwaste.com', 'Dewi Siregar', '$2a$12$neTZMFWDrOdSUg/xXj6SzuQjY08GfMlDBN38lsIvLzE.exmlYjosa', '081233580622'),
+	('CITIZEN', 'd7dc83d2-5897-42be-ae6c-447296eb1c97', '2026-04-26 15:25:52.063976', '2026-04-26 15:25:52.063976', b'1', 'warga43@smartwaste.com', 'Adi Firmansyah', '$2a$12$l1j3MjpWBmuBg87FqjB1qeRBkvO35d.6v84bbeXpq5/Cv7tOjLZBu', '081215045494'),
+	('CITIZEN', 'd8b68cd6-d9e6-4ae7-9a3f-170c2e5c79c3', '2026-04-26 15:25:50.449328', '2026-04-26 15:25:50.449328', b'1', 'warga41@smartwaste.com', 'Ahmad Hidayat', '$2a$12$UrrKK7gGfY/Y31fpOvOCu.LybJfUGtG6.SWtlxRuuw5cS2e6KqQc6', '081296111338'),
+	('CITIZEN', 'da724c70-e971-422f-97eb-10c281e35326', '2026-04-26 15:25:15.634781', '2026-04-26 15:25:15.634781', b'1', 'warga3@smartwaste.com', 'Hendra Pangestu', '$2a$12$Fw1GNmfKurkF7dmwrHMipuvz.4ejZNthXRu7H5eQSQ3EcZIpJJnvS', '081216330262'),
+	('CITIZEN', 'dfe9a4e0-bddf-4263-a44a-208b4357daae', '2026-04-26 15:25:58.081214', '2026-04-26 15:25:58.081214', b'1', 'warga50@smartwaste.com', 'Joko Firmansyah', '$2a$12$XI9mqGZM/7VBQ2A8PkXcneQUma5bQjR9gSIWFdmZpdmr00LCmC0Uu', '081291262686'),
+	('COLLECTOR', 'e2037d74-845a-40bf-868b-a0807f1a08e4', '2026-04-26 20:58:15.834953', '2026-04-26 21:51:29.358127', b'1', 'petugas1@smartwaste.com', 'Budi Santoso', '$2a$12$6vXSTSx8fOMtzuG4XHMAW.0TNjOzvvKLocxIS2DeRodJz707WqdQG', '081100000000'),
+	('CITIZEN', 'e7e5884e-1720-44d0-b3d5-d091698e3524', '2026-04-26 15:25:34.651353', '2026-04-26 15:25:34.651353', b'1', 'warga23@smartwaste.com', 'Nur Nugroho', '$2a$12$kAxxL0ZIv3eLJGWMLX6MT.rKF4npDEOorFYWqdUf9VfpieEuoHnAe', '081296500892'),
+	('CITIZEN', 'eb4c2239-f108-4c78-ac9e-ad354bd546fd', '2026-04-26 15:25:43.336868', '2026-04-26 15:25:43.336868', b'1', 'warga33@smartwaste.com', 'Tri Hidayat', '$2a$12$cRyksnfmmmi6cMBrn2d/.uRbXomnVZnH8dNC/fMh.ef/nwgpoVXfy', '081295411551'),
+	('CITIZEN', 'f02d9684-0501-4386-b3c4-7799a1a42804', '2026-04-26 15:25:31.198240', '2026-04-26 15:25:31.198240', b'1', 'warga19@smartwaste.com', 'Budi Lubis', '$2a$12$Qn6ZR5sjvtCp0zCd2.cFJ.DVm9oFeNOYuWEf9dsdM8ACXkX6sBmpm', '081260077459'),
+	('CITIZEN', 'f052b52b-edf6-4546-985b-cf7cb4d52d4e', '2026-04-26 15:25:20.350562', '2026-04-26 15:25:20.350562', b'1', 'warga7@smartwaste.com', 'Lestari Santoso', '$2a$12$aqO/s2ocENCdpPe7WXu/ZuZA2LCNJfR0Z4pvYQxdq9GZUZI6lij7e', '081276625947'),
+	('CITIZEN', 'f9404ec0-2243-435e-a8eb-04f2902794e3', '2026-04-26 15:25:52.942385', '2026-04-26 15:25:52.942385', b'1', 'warga44@smartwaste.com', 'Ratna Sihombing', '$2a$12$X3j6FFEAWkroCvKiV5yTl.PGDFtT0dAodJbtXKadUrg.xV2ZjMsxq', '081290184595'),
+	('CITIZEN', 'fa469c10-ad7f-404b-b96d-986f0b650e1b', '2026-04-26 15:25:33.763382', '2026-04-26 15:25:33.763382', b'1', 'warga22@smartwaste.com', 'Joko Santoso', '$2a$12$X7WVpA5yZWb91fMabsag4.gNCOqpXluSSnF1Gjw8cNktWAhaBgO4i', '081250087670');
 -- Dumping structure for table db_tubes_pbo_trinetra.admins
 CREATE TABLE IF NOT EXISTS `admins` (
   `position` varchar(100) DEFAULT NULL,
@@ -289,87 +371,9 @@ CREATE TABLE IF NOT EXISTS `point_redemptions` (
 INSERT INTO `point_redemptions` (`id`, `created_at`, `updated_at`, `admin_notes`, `description`, `points_redeemed`, `reward_code`, `status`, `citizen_id`) VALUES
 	('8c15e8b1-a0c7-4f8b-9a05-bdd28eded9a2', '2026-04-26 23:08:18.185622', '2026-04-26 23:08:18.185622', NULL, 'Minyak Goreng 2L', 800, NULL, 'PENDING', '0da6dd2b-486c-4e0e-a99e-83d7a36d155f');
 
--- Dumping structure for table db_tubes_pbo_trinetra.users
-CREATE TABLE IF NOT EXISTS `users` (
-  `user_type` varchar(31) NOT NULL,
-  `id` varchar(36) NOT NULL,
-  `created_at` datetime(6) NOT NULL,
-  `updated_at` datetime(6) NOT NULL,
-  `active` bit(1) NOT NULL,
-  `email` varchar(150) NOT NULL,
-  `name` varchar(100) NOT NULL,
-  `password` varchar(255) NOT NULL,
-  `phone` varchar(20) DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `UK_6dotkott2kjsp8vw4d0m25fb7` (`email`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- Dumping data for table db_tubes_pbo_trinetra.users: ~64 rows (approximately)
-INSERT INTO `users` (`user_type`, `id`, `created_at`, `updated_at`, `active`, `email`, `name`, `password`, `phone`) VALUES
-	('CITIZEN', '0da6dd2b-486c-4e0e-a99e-83d7a36d155f', '2026-04-12 21:43:54.472595', '2026-04-12 22:18:00.882334', b'1', 'warga@smartwaste.com', 'Ahmad Kamarudin', '$2a$12$Q6Q3XB3CKThsOZnCfzvW1O.Y467e10aEg7kU4TI7Ebmo/lWQaDWRi', '081222333444'),
-	('CITIZEN', '0fb8dd2e-679d-4c87-b837-6964b9526fa7', '2026-04-26 15:25:57.203304', '2026-04-26 15:25:57.203304', b'1', 'warga49@smartwaste.com', 'Ahmad Wijaya', '$2a$12$u/57qs1leim9ckdq5FFAkuS.9Cnss/nV7KADTgtuV/5dGGPd2wAlO', '081212686046'),
-	('CITIZEN', '10e873da-3daf-47d6-8045-faee4402daf1', '2026-04-26 15:25:26.973140', '2026-04-26 15:25:26.973140', b'1', 'warga14@smartwaste.com', 'Dwi Nugroho', '$2a$12$niW8t8omo1IUhvF8y7PlUeL9WvNVTTlL/t8A1sKCeD1.dq.e9ikqi', '081240877529'),
-	('COLLECTOR', '130ebb9c-624f-4dc3-924c-7ed9c5c9af6b', '2026-04-26 20:58:23.436232', '2026-04-26 21:51:29.452663', b'1', 'petugas10@smartwaste.com', 'Joko Susilo', '$2a$12$Nsqw/3XBwpY1sWbe7KSyz.pB4DSLHrmNcvaauMwtNeEVE03eBnkZG', '081100000009'),
-	('CITIZEN', '1506fec1-f2ff-4bc8-99a0-8c56ae0f7007', '2026-04-26 15:25:56.316153', '2026-04-26 15:25:56.316153', b'1', 'warga48@smartwaste.com', 'Adi Susanto', '$2a$12$.jPNE/rOwTWLopZCxWwOs./VyAyibmlm4CNpk4Li5PKiiqTVhV9lC', '081284761333'),
-	('CITIZEN', '18b62ad3-019a-48dd-b3e0-d4801e35b97f', '2026-04-26 15:25:14.491139', '2026-04-26 15:25:14.491139', b'1', 'warga2@smartwaste.com', 'Siti Nugroho', '$2a$12$ppcIYbcOwFaRf8V52dyrJ.j.qisRIQKcsoWXKdXWNO/otNwpv7xMW', '081235035324'),
-	('COLLECTOR', '1a61e6a1-3df0-4460-ac64-df177a973473', '2026-04-26 20:58:17.615620', '2026-04-26 21:51:29.402267', b'1', 'petugas3@smartwaste.com', 'Suryo Utomo', '$2a$12$Cy14RMvK4rKVq9D99kkK7eACmb.8k/sO/D3GEDjK1PBO.NwP2v1d6', '081100000002'),
-	('COLLECTOR', '208a695d-6515-4ee7-bef7-8aa87b1fe88e', '2026-04-26 20:58:19.263616', '2026-04-26 21:51:28.668666', b'1', 'petugas5@smartwaste.com', 'Eko Prasetyo', '$2a$12$woxn5ceyxcqkREZjB97FCe4lPeW7yvgXA2Kl2f76itdQ34hF4fo9u', '081100000004'),
-	('ADMIN', '20d4665a-19dc-4c6b-9d6a-822422ed3af2', '2026-04-12 21:31:26.663096', '2026-04-12 21:31:26.663096', b'1', 'admin@smartwaste.com', 'Super Admin', '$2a$12$.BNutnHqMakkPlf.enMIL./ujc2sTCW9o7uPa/tVPwnF5RdEdlebq', '08100000001'),
-	('CITIZEN', '220150b6-a277-4a6e-b467-6152fe1c23ed', '2026-04-26 15:25:55.428887', '2026-04-26 15:25:55.428887', b'1', 'warga47@smartwaste.com', 'Hendra Pangestu', '$2a$12$QQH7UW7/ZuYOFxiiG5lX7eUGJhAvMRTpCMygc6UTfwbe.bTUpFnd.', '081234371663'),
-	('COLLECTOR', '245b8746-cf46-4a94-9148-58dd0315f2b5', '2026-04-12 21:31:27.724937', '2026-04-28 09:12:50.957732', b'1', 'petugas@smartwaste.com', 'Budi Santoso', '$2a$12$mPvwrigOT9oXcK7v7koV8.hJr5xJvYg/FSiSyTZkrran/dImB2JE2', '08100000002'),
-	('COLLECTOR', '2df99938-98b4-4472-a4c0-36cbee6be073', '2026-04-26 20:58:16.787396', '2026-04-26 21:51:29.212789', b'1', 'petugas2@smartwaste.com', 'Andi Wijaya', '$2a$12$0u.70kOHacqmXEFkaIwzqumsciHOTGwDWwVTnSPI287JvYxKCek..', '081100000001'),
-	('COLLECTOR', '35a41428-3349-45ef-af40-fcbaaa42a3c7', '2026-04-26 20:58:22.594282', '2026-04-26 21:51:29.509249', b'1', 'petugas9@smartwaste.com', 'Indra Kusuma', '$2a$12$04Zv0z2/NmSkGxcC7ISor.8FSHHR9LEdQZrcx4JBSEZ0MJ45RFozm', '081100000008'),
-	('CITIZEN', '36f06de1-3827-4a6c-986e-9bacbcb4d4f4', '2026-04-26 15:25:27.837424', '2026-04-26 15:25:27.837424', b'1', 'warga15@smartwaste.com', 'Ahmad Pangestu', '$2a$12$zlT4z823lJFlsEm6pF2kYuZV0vdQwszYszoIa4mfk0ohROIwDjPsW', '081215524418'),
-	('CITIZEN', '38e4112c-2738-418f-9583-6b71903324d6', '2026-04-26 15:25:40.816896', '2026-04-26 15:25:40.816896', b'1', 'warga30@smartwaste.com', 'Eko Hidayat', '$2a$12$SOtuKqZPVt5PV56gvc1Wo.Sf4XDLFWXtdYqyRtWR6svDfxDEfUR4u', '081221349493'),
-	('CITIZEN', '3b4d284b-cd14-4940-8aac-ea5a2a917ab6', '2026-04-26 15:25:53.745801', '2026-04-26 15:25:53.745801', b'1', 'warga45@smartwaste.com', 'Sari Saputra', '$2a$12$fdsznn6Mt2TjlvhTUBP9SOXK.bQx7LtnBtR/NTvRMXMxcDNsZcGEO', '081293752329'),
-	('CITIZEN', '3c413d07-5996-4313-8401-011b46ebf9e1', '2026-04-26 15:25:13.224348', '2026-04-26 15:25:13.224348', b'1', 'warga1@smartwaste.com', 'Putri Wijaya', '$2a$12$l1Hjuh4ypMGSRSqObADpLOPjgMSOjvYMZb3t2UEm4eUQP4e/GYpnK', '081242318276'),
-	('COLLECTOR', '4094bc42-9bd0-40ac-889c-345de5ad6198', '2026-04-12 21:31:28.804002', '2026-04-12 21:31:28.804002', b'1', 'robot001@netradump.iot', 'Robot NetraDUMP-001', '$2a$12$Ig1xw/sHZFQZStMVMwxcU.TJTsoK2xcpgJP4dUsLw6xHveAhdlHLG', NULL),
-	('CITIZEN', '4296719f-5bc4-4c7e-899f-c6718bc96c1a', '2026-04-26 15:25:26.173243', '2026-04-26 15:25:26.173243', b'1', 'warga13@smartwaste.com', 'Ratna Pangestu', '$2a$12$M73YNW7o/I6B11O4daHbFO4hqhoE1EhHZs4WaZ0S70RD3INpUVDd6', '081217660915'),
-	('CITIZEN', '43095137-df51-4004-b68d-b31d1e3adb20', '2026-04-26 15:25:44.177246', '2026-04-26 15:25:44.177246', b'1', 'warga34@smartwaste.com', 'Adi Pratama', '$2a$12$bFbdmUXZroYZD8tn5FaijO7vRCAAYpeD6wU1JpiIhUVvH110VHdX2', '081243676838'),
-	('CITIZEN', '482c6ffd-db87-40fb-b8a7-eb962c9ddb30', '2026-04-26 15:25:38.241026', '2026-04-26 15:25:38.241026', b'1', 'warga27@smartwaste.com', 'Eko Lubis', '$2a$12$WiDHcNtu7jJg5ThdHjiYuek11HZW5nOtUyoxrYMdo/LaTBDXKC.6q', '081216492315'),
-	('CITIZEN', '4981c6f4-bf64-4ba2-8bd8-54a3d89c1935', '2026-04-26 15:25:47.584052', '2026-04-26 15:25:47.584052', b'1', 'warga38@smartwaste.com', 'Sari Wahyudi', '$2a$12$f4l3yy.8uKoKplRu54X5xuf0Vzi8qWkKvOEprdRCEgEQdMoQ5H8P2', '081253053330'),
-	('CITIZEN', '5f788d55-dfcf-456f-8c1e-c1df967691d5', '2026-04-26 15:25:35.547524', '2026-04-26 15:25:35.547524', b'1', 'warga24@smartwaste.com', 'Lestari Sihombing', '$2a$12$N5FsOOuUYM2EWW7rkzJX1erhPemm2hu3/kZekTGcAYPX4rOpIkzdu', '081216446844'),
-	('CITIZEN', '5f82c431-faab-4f52-9946-477a5403f451', '2026-04-26 15:25:39.107587', '2026-04-26 15:25:39.107587', b'1', 'warga28@smartwaste.com', 'Siti Pangestu', '$2a$12$KmUuEEL/d5K.qcxPzm9.fO8WgqxC/7VyBBkntKcS0rR8jJTr1xnqS', '081294299977'),
-	('CITIZEN', '62e88cb0-1c54-4f23-bfc7-2eab9db66a46', '2026-04-26 15:25:25.227690', '2026-04-26 15:25:25.227690', b'1', 'warga12@smartwaste.com', 'Dwi Wahyudi', '$2a$12$i9oV3rzqr9jjIiVs/Rp64.PeDTpC0yverwlXJX9/IMYe2wDZCEbsO', '081256308580'),
-	('CITIZEN', '71b10466-8e32-49d2-bdc5-814c7387915b', '2026-04-26 15:25:46.730338', '2026-04-26 15:25:46.730338', b'1', 'warga37@smartwaste.com', 'Dwi Hidayat', '$2a$12$jW6gE0oyi3zMaM/xHQ41.eoHLQY/8QVPB0f7j9yqvHfV8pYy.CrBW', '081279667706'),
-	('CITIZEN', '735016c5-7255-46ee-9031-9ed94a27d90f', '2026-04-26 15:25:28.734938', '2026-04-26 15:25:28.734938', b'1', 'warga16@smartwaste.com', 'Sri Kusuma', '$2a$12$/gvsvi8kQHgpsi7DNnk3X.VF1Ujimkuxh/lXxrwTVMWwga5.5Yltm', '081245578393'),
-	('CITIZEN', '7b644e69-dde6-45e9-864e-6d1eee7ff0c5', '2026-04-26 15:25:45.888351', '2026-04-26 15:25:45.888351', b'1', 'warga36@smartwaste.com', 'Budi Sihombing', '$2a$12$7GOUWvu0LPF1bUN.4/DSfuaEzrejnjsrHC9ab/bt/eGjARZO7D4di', '081224794096'),
-	('CITIZEN', '7d2ccc7a-c37c-4c88-87d1-bc474486fb6a', '2026-04-26 15:25:41.643795', '2026-04-26 15:25:41.643795', b'1', 'warga31@smartwaste.com', 'Siti Pratama', '$2a$12$4T/SCQ0.T071Po1bQuso..cP6yp4KtCx97gaUtjS6tvRLg5WKm7di', '081282545606'),
-	('CITIZEN', '7f02c92e-ac34-49a8-8698-b32986ea2ee1', '2026-04-26 15:25:45.054666', '2026-04-26 15:25:45.054666', b'1', 'warga35@smartwaste.com', 'Nur Nugroho', '$2a$12$.LOd5EupcGLDebH8.qoUIORewXCDqcsH/dhs1Zfjr5Xr1KVr8W8NO', '081211584378'),
-	('CITIZEN', '7fda2150-942f-4283-b964-cdf04e467c10', '2026-04-26 15:25:54.599292', '2026-04-26 15:25:54.599292', b'1', 'warga46@smartwaste.com', 'Ahmad Pratama', '$2a$12$57rTKBvwL8QqMtOvJtduKO1B.HN0rVdFhAtBg.P26ogSj9EKdzSau', '081284282553'),
-	('CITIZEN', '83741056-db1c-43a6-9ad7-3a12e2d75d06', '2026-04-26 15:25:24.146475', '2026-04-26 15:25:24.146475', b'1', 'warga11@smartwaste.com', 'Sri Firmansyah', '$2a$12$H9tkxY20/17c1/BwF5K/DuADDoIlosli1VN98mOkKhhFqml3tGsbu', '081263476431'),
-	('CITIZEN', '85945231-e152-43ae-8b76-d6a27d999e8b', '2026-04-26 15:25:32.915126', '2026-04-26 15:25:32.915126', b'1', 'warga21@smartwaste.com', 'Hendra Saputra', '$2a$12$Y34LQeeJosSYbF6LIiEpU.nWA9r5xQGn7oLZvppNVA9y/o42qMUni', '081289330095'),
-	('CITIZEN', '88c9c96f-639a-44b0-ac1e-ceca300374c0', '2026-04-26 15:25:42.482750', '2026-04-26 15:25:42.482750', b'1', 'warga32@smartwaste.com', 'Dwi Santoso', '$2a$12$uqNaTOM55Kw3R91eUNpCweO2AVGDRmnqxlh9ZYQN4n4vLSe7pFn1i', '081233013622'),
-	('CITIZEN', '8fe94d3d-1a51-41d8-a0ca-b9e2e49959c3', '2026-04-26 15:25:16.717062', '2026-04-26 15:25:16.717062', b'1', 'warga4@smartwaste.com', 'Ayu Pratama', '$2a$12$uZPVTWat/C6DTuI0bcOv3uwD0roN0HMWo5t3pviy8I57/1AvY91zm', '081262113232'),
-	('CITIZEN', '93bc354a-e558-4ea4-a613-7c8ed28dff63', '2026-04-26 15:25:17.840810', '2026-04-26 15:25:17.840810', b'1', 'warga5@smartwaste.com', 'Dwi Nugroho', '$2a$12$IF0Py.MlX1UnIZpOnX9UaOfAKrV3O0QkhOKKe4vz6PBHo09PwB3pO', '081234411547'),
-	('COLLECTOR', '956186bd-4a29-4e18-a49d-180ad4289cf7', '2026-04-26 20:58:21.769996', '2026-04-26 21:51:28.813326', b'1', 'petugas8@smartwaste.com', 'Heri Setiawan', '$2a$12$d/WjcrEjNM2O89PyVunf5.LqTSehW7nc38LvCo2arpGZoxcKSGQiS', '081100000007'),
-	('COLLECTOR', '98419feb-da21-4d78-97bf-62a2199d6c8c', '2026-04-26 20:58:18.436372', '2026-04-26 21:51:28.968364', b'1', 'petugas4@smartwaste.com', 'Dedi Kurniawan', '$2a$12$AyCA7h5qe2Mpc5AovvygR.HyDkTLheQWQMRE3zQLyXIcgk9grJ2n.', '081100000003'),
-	('COLLECTOR', '9a398868-8a1f-4e30-9872-e887e380af93', '2026-04-26 20:58:20.936234', '2026-04-26 21:51:29.312481', b'1', 'petugas7@smartwaste.com', 'Guntur Saputra', '$2a$12$rxM8DYR/o/h1dULNCDSO/eJmGH1y4STgDE.SwafsqCTwwbKyKsdOy', '081100000006'),
-	('CITIZEN', '9e1ec042-85f8-4272-94f1-d7e7cfb8f5d3', '2026-04-26 15:25:37.332938', '2026-04-26 15:25:37.332938', b'1', 'warga26@smartwaste.com', 'Nur Santoso', '$2a$12$ZVQV4J4Bv9fkS/AFCCCaPeyEq23bV6ZgdD1QUmccLFOtqT8501rRW', '081289661041'),
-	('CITIZEN', '9fdfd91d-f237-4346-9c38-04fb9be9a98c', '2026-04-26 15:25:32.058957', '2026-04-26 15:25:32.058957', b'1', 'warga20@smartwaste.com', 'Eko Firmansyah', '$2a$12$LL6kVgpS4ZzQ4XdW8z2tyeenrpqHA2XQ8PdP8VaN6xdSdNCAtjdf6', '081256061643'),
-	('CITIZEN', 'a085dd41-6103-4858-a2b0-417dbb93de09', '2026-04-26 15:25:49.525926', '2026-04-26 15:25:49.525926', b'1', 'warga40@smartwaste.com', 'Rini Kusuma', '$2a$12$WFwhBvO5dxQSGK7qt0D89ejaZA6iAxrXZi3h2kVFhCvrylZ.0HOSi', '081237236771'),
-	('CITIZEN', 'a1fdb247-7f63-414a-b34e-5f379a505c55', '2026-04-26 15:25:30.407644', '2026-04-26 15:25:30.407644', b'1', 'warga18@smartwaste.com', 'Adi Wahyudi', '$2a$12$C2B0CQVsLlIH6DMor/Rn5OBWgj1maDKvYyPJNxabgp1IhnuQBckFO', '081282648849'),
-	('COLLECTOR', 'b74ccbf8-270e-4222-88ec-44fd9d1f15d5', '2026-04-26 20:58:20.095330', '2026-04-26 21:51:29.057812', b'1', 'petugas6@smartwaste.com', 'Fajar Ramadhan', '$2a$12$VRiyqSraZbGDw1ubY1Cnf.QBUHxYwzojlE1141ncuD8DS1QefTKWa', '081100000005'),
-	('CITIZEN', 'b8566336-b51f-49d4-a838-dbac75545acc', '2026-04-26 15:25:39.944908', '2026-04-26 15:25:39.944908', b'1', 'warga29@smartwaste.com', 'Ahmad Lubis', '$2a$12$Q5W2XI3O260zGwB4GGPIjeyo6waqQsuM9vAcMcXe1wKOp7Udc1zaS', '081273999141'),
-	('CITIZEN', 'bd2dc7f2-90dd-4644-9c9f-0241edaab70b', '2026-04-26 15:25:51.253782', '2026-04-26 15:25:51.253782', b'1', 'warga42@smartwaste.com', 'Lestari Pangestu', '$2a$12$fHFnG.eCXcWZOl1IzG5uleJJ8Ri26FTm88VyDPWGBL.2TaooBiQhu', '081224439218'),
-	('CITIZEN', 'bffb0d79-03cf-4a88-9219-b00db794c1f6', '2026-04-26 15:25:22.277229', '2026-04-26 15:25:22.277229', b'1', 'warga9@smartwaste.com', 'Agus Wahyudi', '$2a$12$x2GezrdHwxC3phFHwciIWOUU9fpEY5QYMrd9A0IyeKWSgr91nqCUK', '081254338303'),
-	('CITIZEN', 'c0f5bf5a-94a4-42e7-8a3a-c30a9ca10faf', '2026-04-26 15:25:36.405214', '2026-04-26 15:25:36.405214', b'1', 'warga25@smartwaste.com', 'Eko Siregar', '$2a$12$i9m4uD1sx47IPMRe0fU0U.33on3qAGzq19ABNrU9/MYCf/29YwkTq', '081211051897'),
-	('CITIZEN', 'c230d565-bf47-4ecb-a9c3-9f01a854eb0d', '2026-04-26 15:25:23.168092', '2026-04-26 15:25:23.168092', b'1', 'warga10@smartwaste.com', 'Eko Pangestu', '$2a$12$V.AsWQG5AFnvRW9XQaF8r.bVR9/pjqkexb.l.XMA06ulVKQS8xMrO', '081281255105'),
-	('CITIZEN', 'c661afad-1d0d-481f-87f9-8655bbb2a105', '2026-04-26 15:25:19.160217', '2026-04-26 15:25:19.160217', b'1', 'warga6@smartwaste.com', 'Ratna Kusuma', '$2a$12$z3Sw4yHEBcOcK5SI6VWyZ.snMcs4k0G8IWU1Wxl2WQ5xLdyKdAytu', '081273950104'),
-	('CITIZEN', 'c96f1890-97aa-4284-be5d-89130bc13f32', '2026-04-26 15:25:48.478492', '2026-04-26 15:25:48.478492', b'1', 'warga39@smartwaste.com', 'Sari Wahyudi', '$2a$12$7ElNd9M0lAl8uPLp4Qz5B.pG1PtD8gOIWv98SCItY0/48Dt2yjdl6', '081227169283'),
-	('CITIZEN', 'ce9dd90d-0a34-490f-ab94-95f5edc129bd', '2026-04-26 15:25:21.268470', '2026-04-26 15:25:21.268470', b'1', 'warga8@smartwaste.com', 'Dewi Siregar', '$2a$12$1PgwifZpi/LX7akFmps3BuaYH3/ZsKCWTWffrNhk0joWusVvanqTi', '081241778923'),
-	('CITIZEN', 'd5f5c72d-3971-4a5a-842b-375b03183b8c', '2026-04-26 15:25:29.601895', '2026-04-26 15:25:29.601895', b'1', 'warga17@smartwaste.com', 'Dewi Siregar', '$2a$12$neTZMFWDrOdSUg/xXj6SzuQjY08GfMlDBN38lsIvLzE.exmlYjosa', '081233580622'),
-	('CITIZEN', 'd7dc83d2-5897-42be-ae6c-447296eb1c97', '2026-04-26 15:25:52.063976', '2026-04-26 15:25:52.063976', b'1', 'warga43@smartwaste.com', 'Adi Firmansyah', '$2a$12$l1j3MjpWBmuBg87FqjB1qeRBkvO35d.6v84bbeXpq5/Cv7tOjLZBu', '081215045494'),
-	('CITIZEN', 'd8b68cd6-d9e6-4ae7-9a3f-170c2e5c79c3', '2026-04-26 15:25:50.449328', '2026-04-26 15:25:50.449328', b'1', 'warga41@smartwaste.com', 'Ahmad Hidayat', '$2a$12$UrrKK7gGfY/Y31fpOvOCu.LybJfUGtG6.SWtlxRuuw5cS2e6KqQc6', '081296111338'),
-	('CITIZEN', 'da724c70-e971-422f-97eb-10c281e35326', '2026-04-26 15:25:15.634781', '2026-04-26 15:25:15.634781', b'1', 'warga3@smartwaste.com', 'Hendra Pangestu', '$2a$12$Fw1GNmfKurkF7dmwrHMipuvz.4ejZNthXRu7H5eQSQ3EcZIpJJnvS', '081216330262'),
-	('CITIZEN', 'dfe9a4e0-bddf-4263-a44a-208b4357daae', '2026-04-26 15:25:58.081214', '2026-04-26 15:25:58.081214', b'1', 'warga50@smartwaste.com', 'Joko Firmansyah', '$2a$12$XI9mqGZM/7VBQ2A8PkXcneQUma5bQjR9gSIWFdmZpdmr00LCmC0Uu', '081291262686'),
-	('COLLECTOR', 'e2037d74-845a-40bf-868b-a0807f1a08e4', '2026-04-26 20:58:15.834953', '2026-04-26 21:51:29.358127', b'1', 'petugas1@smartwaste.com', 'Budi Santoso', '$2a$12$6vXSTSx8fOMtzuG4XHMAW.0TNjOzvvKLocxIS2DeRodJz707WqdQG', '081100000000'),
-	('CITIZEN', 'e7e5884e-1720-44d0-b3d5-d091698e3524', '2026-04-26 15:25:34.651353', '2026-04-26 15:25:34.651353', b'1', 'warga23@smartwaste.com', 'Nur Nugroho', '$2a$12$kAxxL0ZIv3eLJGWMLX6MT.rKF4npDEOorFYWqdUf9VfpieEuoHnAe', '081296500892'),
-	('CITIZEN', 'eb4c2239-f108-4c78-ac9e-ad354bd546fd', '2026-04-26 15:25:43.336868', '2026-04-26 15:25:43.336868', b'1', 'warga33@smartwaste.com', 'Tri Hidayat', '$2a$12$cRyksnfmmmi6cMBrn2d/.uRbXomnVZnH8dNC/fMh.ef/nwgpoVXfy', '081295411551'),
-	('CITIZEN', 'f02d9684-0501-4386-b3c4-7799a1a42804', '2026-04-26 15:25:31.198240', '2026-04-26 15:25:31.198240', b'1', 'warga19@smartwaste.com', 'Budi Lubis', '$2a$12$Qn6ZR5sjvtCp0zCd2.cFJ.DVm9oFeNOYuWEf9dsdM8ACXkX6sBmpm', '081260077459'),
-	('CITIZEN', 'f052b52b-edf6-4546-985b-cf7cb4d52d4e', '2026-04-26 15:25:20.350562', '2026-04-26 15:25:20.350562', b'1', 'warga7@smartwaste.com', 'Lestari Santoso', '$2a$12$aqO/s2ocENCdpPe7WXu/ZuZA2LCNJfR0Z4pvYQxdq9GZUZI6lij7e', '081276625947'),
-	('CITIZEN', 'f9404ec0-2243-435e-a8eb-04f2902794e3', '2026-04-26 15:25:52.942385', '2026-04-26 15:25:52.942385', b'1', 'warga44@smartwaste.com', 'Ratna Sihombing', '$2a$12$X3j6FFEAWkroCvKiV5yTl.PGDFtT0dAodJbtXKadUrg.xV2ZjMsxq', '081290184595'),
-	('CITIZEN', 'fa469c10-ad7f-404b-b96d-986f0b650e1b', '2026-04-26 15:25:33.763382', '2026-04-26 15:25:33.763382', b'1', 'warga22@smartwaste.com', 'Joko Santoso', '$2a$12$X7WVpA5yZWb91fMabsag4.gNCOqpXluSSnF1Gjw8cNktWAhaBgO4i', '081250087670');
+
+
 
 -- Dumping structure for table db_tubes_pbo_trinetra.waste_categories
 CREATE TABLE IF NOT EXISTS `waste_categories` (
@@ -387,13 +391,13 @@ CREATE TABLE IF NOT EXISTS `waste_categories` (
 
 -- Dumping data for table db_tubes_pbo_trinetra.waste_categories: ~7 rows (approximately)
 INSERT INTO `waste_categories` (`id`, `created_at`, `updated_at`, `active`, `description`, `icon_url`, `name`, `points_per_kg`, `type`) VALUES
-	('032cc629-1ced-441c-9d92-418638f7ea0f', '2026-04-12 21:31:28.928126', '2026-04-12 21:31:28.928126', b'1', 'Kertas bekas, koran, majalah, kardus bersih yang dapat didaur ulang', '📦', 'Kertas & Kardus', 8, 'INORGANIC'),
-	('22246f99-6f62-486c-bdeb-a43fd960b624', '2026-04-12 21:31:28.942473', '2026-04-12 21:31:28.942473', b'1', 'Kaleng minuman, kaleng makanan dari aluminium atau baja', '🥫', 'Kaleng Logam', 15, 'INORGANIC'),
-	('446cb7af-2f2f-4289-9c8c-d174b82ce4dd', '2026-04-12 21:31:28.890555', '2026-04-12 21:31:28.890555', b'1', 'Sampah organik dari kebun seperti daun kering dan ranting kecil', '🍃', 'Daun & Ranting', 3, 'ORGANIC'),
-	('504d5b87-5675-4ce0-9bda-b8f305ebec10', '2026-04-12 21:31:28.913797', '2026-04-12 21:31:28.913797', b'1', 'Botol minuman plastik jenis PET yang dapat didaur ulang', '♻️', 'Botol Plastik (PET)', 12, 'INORGANIC'),
-	('8efe8add-58ba-4181-8a5b-4c25e8cdef30', '2026-04-12 21:31:28.959472', '2026-04-12 21:31:28.959472', b'1', 'Baterai AA, AAA, baterai tombol, atau baterai lithium bekas — limbah B3', '🔋', 'Baterai Bekas', 30, 'B3'),
-	('9e95c899-0fd6-4dc0-88c3-aa1cfeefeee8', '2026-04-12 21:31:28.992487', '2026-04-12 21:31:28.992487', b'1', 'Handphone rusak, charger bekas, PCB, lampu LED/neon — limbah B3 elektronik', '💻', 'Elektronik & E-Waste', 50, 'B3'),
-	('ed7cc969-180c-44d8-9a27-89f1d3743699', '2026-04-12 21:31:28.865670', '2026-04-12 21:31:28.865670', b'1', 'Sampah organik dari sisa makanan, sayuran, dan buah-buahan', '🍎', 'Sisa Makanan & Dapur', 5, 'ORGANIC');
+	('032cc629-1ced-441c-9d92-418638f7ea0f', '2026-04-12 21:31:28.928126', '2026-04-12 21:31:28.928126', b'1', 'Kertas bekas, koran, majalah, kardus bersih yang dapat didaur ulang', 'ðŸ“¦', 'Kertas & Kardus', 8, 'INORGANIC'),
+	('22246f99-6f62-486c-bdeb-a43fd960b624', '2026-04-12 21:31:28.942473', '2026-04-12 21:31:28.942473', b'1', 'Kaleng minuman, kaleng makanan dari aluminium atau baja', 'ðŸ¥«', 'Kaleng Logam', 15, 'INORGANIC'),
+	('446cb7af-2f2f-4289-9c8c-d174b82ce4dd', '2026-04-12 21:31:28.890555', '2026-04-12 21:31:28.890555', b'1', 'Sampah organik dari kebun seperti daun kering dan ranting kecil', 'ðŸƒ', 'Daun & Ranting', 3, 'ORGANIC'),
+	('504d5b87-5675-4ce0-9bda-b8f305ebec10', '2026-04-12 21:31:28.913797', '2026-04-12 21:31:28.913797', b'1', 'Botol minuman plastik jenis PET yang dapat didaur ulang', 'â™»ï¸', 'Botol Plastik (PET)', 12, 'INORGANIC'),
+	('8efe8add-58ba-4181-8a5b-4c25e8cdef30', '2026-04-12 21:31:28.959472', '2026-04-12 21:31:28.959472', b'1', 'Baterai AA, AAA, baterai tombol, atau baterai lithium bekas â€” limbah B3', 'ðŸ”‹', 'Baterai Bekas', 30, 'B3'),
+	('9e95c899-0fd6-4dc0-88c3-aa1cfeefeee8', '2026-04-12 21:31:28.992487', '2026-04-12 21:31:28.992487', b'1', 'Handphone rusak, charger bekas, PCB, lampu LED/neon â€” limbah B3 elektronik', 'ðŸ’»', 'Elektronik & E-Waste', 50, 'B3'),
+	('ed7cc969-180c-44d8-9a27-89f1d3743699', '2026-04-12 21:31:28.865670', '2026-04-12 21:31:28.865670', b'1', 'Sampah organik dari sisa makanan, sayuran, dan buah-buahan', 'ðŸŽ', 'Sisa Makanan & Dapur', 5, 'ORGANIC');
 
 -- Dumping structure for table db_tubes_pbo_trinetra.waste_deposits
 CREATE TABLE IF NOT EXISTS `waste_deposits` (
@@ -600,3 +604,5 @@ INSERT INTO `waste_deposits` (`id`, `created_at`, `updated_at`, `confirmed_at`, 
 /*!40014 SET FOREIGN_KEY_CHECKS=IFNULL(@OLD_FOREIGN_KEY_CHECKS, 1) */;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40111 SET SQL_NOTES=IFNULL(@OLD_SQL_NOTES, 1) */;
+
+

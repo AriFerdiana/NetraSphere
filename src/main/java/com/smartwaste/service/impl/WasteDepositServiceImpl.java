@@ -204,6 +204,7 @@ public class WasteDepositServiceImpl implements WasteDepositService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Page<WasteDepositResponse> getAllDeposits(java.time.LocalDateTime startDate, java.time.LocalDateTime endDate, String statusStr, Pageable pageable) {
         DepositStatus status = null;
         if (statusStr != null && !statusStr.isBlank()) {
@@ -252,32 +253,33 @@ public class WasteDepositServiceImpl implements WasteDepositService {
     /** Mapper: WasteDeposit entity → WasteDepositResponse DTO */
     private WasteDepositResponse mapToResponse(WasteDeposit deposit) {
         String finalLocation = deposit.getLocation();
-        if (finalLocation == null || finalLocation.isEmpty()) {
+        if ((finalLocation == null || finalLocation.isEmpty()) && deposit.getCitizen() != null) {
             finalLocation = deposit.getCitizen().getAddress();
         }
 
         return WasteDepositResponse.builder()
                 .id(deposit.getId())
-                .citizenName(deposit.getCitizen().getName())
-                .citizenId(deposit.getCitizen().getId())
-                .citizenPhone(deposit.getCitizen().getPhone())
-                .categoryName(deposit.getCategory().getName())
-                .categoryType(deposit.getCategory().getType().name())
+                .citizenName(deposit.getCitizen() != null ? deposit.getCitizen().getName() : "Anonim")
+                .citizenId(deposit.getCitizen() != null ? deposit.getCitizen().getId() : null)
+                .citizenPhone(deposit.getCitizen() != null ? deposit.getCitizen().getPhone() : "-")
+                .categoryName(deposit.getCategory() != null ? deposit.getCategory().getName() : "-")
+                .categoryType(deposit.getCategory() != null && deposit.getCategory().getType() != null 
+                        ? deposit.getCategory().getType().name() : "INORGANIC")
                 .collectorName(deposit.getCollector() != null ? deposit.getCollector().getName() : null)
                 .weightKg(deposit.getWeightKg())
                 .pointsEarned(deposit.getPointsEarned())
-                .pointsPerKg(deposit.getCategory().getPointsPerKg())
+                .pointsPerKg(deposit.getCategory() != null ? deposit.getCategory().getPointsPerKg() : 0)
                 .status(deposit.getStatus())
                 .notes(deposit.getNotes())
                 .imageUrl(deposit.getImageUrl())
                 .fromIoT(deposit.isFromIoT())
                 .iotDeviceId(deposit.getIotDeviceId())
-                .location(finalLocation)
+                .location(finalLocation != null ? finalLocation : "-")
                 .confirmedAt(deposit.getConfirmedAt())
                 .createdAt(deposit.getCreatedAt())
                 .pickupProofUrl(deposit.getPickupProofUrl())
-                .citizenDepositCount(deposit.getCitizen() != null ? depositRepository.countByCitizenAndStatus(deposit.getCitizen(), DepositStatus.CONFIRMED) : 0)
-                .citizenTotalWeight(deposit.getCitizen() != null ? depositRepository.sumWeightByCitizen(deposit.getCitizen()) : 0.0)
+                .citizenDepositCount(0)
+                .citizenTotalWeight(0.0)
                 .build();
     }
 

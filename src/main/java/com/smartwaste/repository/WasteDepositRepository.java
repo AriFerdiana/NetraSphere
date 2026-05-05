@@ -19,6 +19,7 @@ import java.util.List;
 @Repository
 public interface WasteDepositRepository extends JpaRepository<WasteDeposit, String> {
 
+    @org.springframework.data.jpa.repository.EntityGraph(attributePaths = {"citizen", "category"})
     Page<WasteDeposit> findByCitizen(Citizen citizen, Pageable pageable);
 
     Page<WasteDeposit> findByCollector(com.smartwaste.entity.Collector collector, Pageable pageable);
@@ -27,6 +28,7 @@ public interface WasteDepositRepository extends JpaRepository<WasteDeposit, Stri
 
     long countByCitizenAndStatus(Citizen citizen, DepositStatus status);
 
+    @org.springframework.data.jpa.repository.EntityGraph(attributePaths = {"citizen", "category"})
     Page<WasteDeposit> findByStatus(DepositStatus status, Pageable pageable);
 
     long countByStatus(DepositStatus status);
@@ -79,7 +81,9 @@ public interface WasteDepositRepository extends JpaRepository<WasteDeposit, Stri
            "GROUP BY d.category.name")
     List<Object[]> findCategoryStatsByCollector(@Param("collector") com.smartwaste.entity.Collector collector);
 
+    @org.springframework.data.jpa.repository.EntityGraph(attributePaths = {"citizen", "category"})
     Page<WasteDeposit> findByCreatedAtBetween(java.time.LocalDateTime start, java.time.LocalDateTime end, Pageable pageable);
-    
+
+    @org.springframework.data.jpa.repository.EntityGraph(attributePaths = {"citizen", "category"})
     Page<WasteDeposit> findByStatusAndCreatedAtBetween(DepositStatus status, java.time.LocalDateTime start, java.time.LocalDateTime end, Pageable pageable);
 }
